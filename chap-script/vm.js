@@ -16,19 +16,13 @@ class VM {
     console.log('addBytecode:', this._bytecode.toString('hex'))
   }
 
-  _fetchUInt8() {
-    const res = this._bytecode.readUInt8(this._offset)
-    this._offset++
-    return res
-  }
-
-  register(opCode, func) {
+  register(opCode, mnemonic, func) {
     this._op[opCode] = func
   }
 
   step() {
     assert(this._bytecode.length > 0)
-    const opCode = this._fetchUInt8()
+    const opCode = this._bytecode.readUInt8(this._offset++)
     if (!(opCode in this._bytecode)) {
       throw new Error(`unknown OPCODE: ${opCode.toString(16)}`)
     }
