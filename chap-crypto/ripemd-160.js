@@ -2,7 +2,7 @@ const ripemd160 = buf => {
   var kLeft = [0x00000000, 0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xa953fd4e]
   var kRight = [0x50a28be6, 0x5c4dd124, 0x6d703ef3, 0x7a6d76e9, 0x00000000]
 
-  const createUIn64LEBuffer = n => {
+  const createUInt64LEBuffer = n => {
     const buf = Buffer.alloc(8)
     buf.writeUInt32LE(n, 0)
     buf.writeUInt32LE(n / 2 ** 32 | 0, 4)
@@ -12,7 +12,7 @@ const ripemd160 = buf => {
   const paddingBuf = (buf, nChunks) => {
     const nZeroPadding = nChunks * 64 - buf.length - 8 - 1
     const padding = Buffer.from([0x80, ...Array(nZeroPadding).fill(0)])
-    const lengthInfo = createUIn64LEBuffer(buf.length * 8)
+    const lengthInfo = createUInt64LEBuffer(buf.length * 8)
     return Buffer.concat([buf, padding, lengthInfo])
   }
   
