@@ -1,14 +1,25 @@
 const registerOpFlow = table => {
-  table[0x61] = () => 0
-  table[0x6a] = () => {
-    throw new Error('RETURN')
-  }
-  table[0x69] = (buf, stack) => {
-    if (stack.pop() !== 1) {
-      throw new Error ('VERIFY FAILED')
+  table.push({
+    opCode: 0x61,
+    mnemonic: ['NOP'],
+    func: () => 0
+  })
+  table.push({
+    opCode: 0x6a,
+    mnemonic: ['RETURN'],
+    func: () => {
+      throw new Error('RETURN')
     }
-    return 0
-  }
+  })
+  table.push({
+    opCode: 0x69,
+    mnemonic: ['VERIFY'],
+    func: ({stack}) => {
+      if (stack.pop() !== 1) {
+        throw new Error ('VERIFY FAILED')
+      }
+    }
+  })
 }
 
 module.exports = {

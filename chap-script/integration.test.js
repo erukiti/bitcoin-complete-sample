@@ -1,4 +1,5 @@
 const {VM} = require('./vm')
+const {getAfterStack, createOpTable} = require('./utils')
 const {registerOpArithmetic} = require('./op-arithmetic')
 const {registerOpBitwise} = require('./op-bitwise')
 const {registerOpConstant} = require('./op-constant')
@@ -6,13 +7,14 @@ const {registerOpFlow} = require('./op-flow')
 const {registerOpStack} = require('./op-stack')
 const {registerOpCrypto} = require('./op-crypto')
 
-const table = Array(256)
-registerOpArithmetic(table)
-registerOpBitwise(table)
-registerOpConstant(table)
-registerOpCrypto(table)
-registerOpFlow(table)
-registerOpStack(table)
+const table = createOpTable(
+  registerOpArithmetic,
+  registerOpBitwise,
+  registerOpConstant,
+  registerOpCrypto,
+  registerOpFlow,
+  // registerOpStack
+)
 
 it('', () => {
   const scriptSig =

@@ -7,7 +7,6 @@ const registerOpArithmetic = table => {
     func: ({ stack }) => {
       assert(stack.length >= 1)
       stack.push(stack.pop() + 1)
-      return 0
     }
   })
 
@@ -205,7 +204,7 @@ const registerOpArithmetic = table => {
 
   table.push({
     opCode: 0xa5,
-    mnemonic: 'WITHIN',
+    mnemonic: ['WITHIN'],
     func: ({ stack }) => {
       assert(stack.length >= 3)
       const max = stack.pop()
