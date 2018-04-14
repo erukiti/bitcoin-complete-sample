@@ -1,3 +1,5 @@
+const assert = require('assert')
+
 const { PacketDecoder } = require('../chap-encode/packet-decoder')
 
 const decodeTransaction = buf => {

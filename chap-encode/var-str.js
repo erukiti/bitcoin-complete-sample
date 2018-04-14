@@ -6,7 +6,7 @@ const decodeVarStr = (buf, offset = 0) => {
 }
 
 const encodeVarStr = s => {
-  return Buffer.concat([encodeVarInt(s.length), new Buffer(s)])
+  return Buffer.concat([encodeVarInt(s.length), Buffer.from(s)])
 }
 
 module.exports = { decodeVarStr, encodeVarStr }

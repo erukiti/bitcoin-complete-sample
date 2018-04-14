@@ -1,0 +1,11 @@
+#! /usr/bin/env node
+
+const {decodeTransaction} = require('../chap-transaction/decode-transaction')
+
+if (process.argv.length > 2) {
+    console.log(JSON.stringify(decodeTransaction(Buffer.from(process.argv[2].replace(/\s/g, ''), 'hex')), null, '  '))
+}
+
+process.stdin.on('data', data => {
+    console.log(JSON.stringify(decodeTransaction(Buffer.from(data.toString().replace(/\s/g, ''), 'hex')), null, '  '))
+})

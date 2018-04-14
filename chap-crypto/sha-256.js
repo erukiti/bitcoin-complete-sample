@@ -1,6 +1,11 @@
 const {createChunks} = require('./sha-256-chunk')
 const {compression} = require('./sha-256-compression')
 
+/**
+ * 入力データのSHA-256ハッシュ値を得る
+ * @param {Buffer} buf 
+ * @returns {string} SHA-256を通したあとのHEX文字列
+ */
 const sha256 = buf => {
   const chunks = createChunks((typeof buf === 'string') ? Buffer.from(buf, 'binary') : buf)
 
@@ -21,7 +26,7 @@ const sha256 = buf => {
     }
   })
 
-  const result = new Buffer(32)
+  const result = Buffer.alloc(32)
   hash.forEach((h, index) => {
     result.writeInt32BE(h, index * 4)
   })

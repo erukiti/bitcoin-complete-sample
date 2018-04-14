@@ -13,14 +13,14 @@ const decodeVarInt = (buf, offset = 0) => {
 const encodeVarInt = n => {
   let buf
   if (n <= 0xfc) {
-    buf = new Buffer(1)
+    buf = Buffer.alloc(1)
     buf.writeUInt8(n)
   } else if (n <= 0xffff) {
-    buf = new Buffer(3)
+    buf = Buffer.alloc(3)
     buf.writeUInt8(0xfd)
     buf.writeUInt16LE(n, 1)
   } else if (n <= 0xffffffff) {
-    buf = new Buffer(5)
+    buf = Buffer.alloc(5)
     buf.writeUInt8(0xfe)
     buf.writeUInt32LE(n, 1)
   }

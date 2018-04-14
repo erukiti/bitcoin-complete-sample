@@ -1,3 +1,8 @@
+/**
+ * 入力データのRIPEMD-160ハッシュ値を得る
+ * @param {Buffer} buf 
+ * @returns {string} RIPEMD-160を通したあとのHEX文字列
+ */
 const ripemd160 = buf => {
   var kLeft = [0x00000000, 0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xa953fd4e]
   var kRight = [0x50a28be6, 0x5c4dd124, 0x6d703ef3, 0x7a6d76e9, 0x00000000]
@@ -32,7 +37,7 @@ const ripemd160 = buf => {
     return chunks
   }
 
-  const chunks = createChunks(new Buffer(buf))
+  const chunks = createChunks(Buffer.from(buf))
 
   let a = 0x67452301
   let b = 0xefcdab89

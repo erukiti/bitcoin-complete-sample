@@ -21,4 +21,4 @@ const createTx = (key, to, value, prevHash = null) => {
 
 console.log(alice.getPrivateKey(), bob)
 // console.log(createTx(alice, 'hoge', 1, 'fuga'))
-console.log(crypto.privateEncrypto(alice.getPrivateKey(), new Buffer('hoge')))
+console.log(crypto.privateEncrypto(alice.getPrivateKey(), Buffer.from('hoge')))

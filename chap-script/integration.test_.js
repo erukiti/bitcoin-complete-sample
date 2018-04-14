@@ -13,7 +13,7 @@ const table = createOpTable(
   registerOpConstant,
   registerOpCrypto,
   registerOpFlow,
-  // registerOpStack
+  registerOpStack
 )
 
 it('', () => {

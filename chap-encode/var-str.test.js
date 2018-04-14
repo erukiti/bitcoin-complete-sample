@@ -8,6 +8,6 @@ describe('varstr', () => {
   })
 
   it('encode', () => {
-    expect(encodeVarStr('hoge')).toEqual(Buffer.concat([new Buffer([4]), new Buffer('hoge')]))
+    expect(encodeVarStr('hoge')).toEqual(Buffer.concat([Buffer.from([4]), Buffer.from('hoge')]))
   })
 })

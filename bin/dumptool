@@ -1,0 +1,50 @@
+#! /usr/bin/env node
+
+const {BitcoinPeer} = require('../chap-p2p/bitcoin-peer')
+const {encodeVersion} = require('../chap-p2p/packet/version')
+
+const peer = new BitcoinPeer()
+const version = encodeVersion()
+peer.send('version', version)
+
+peer.onCommand('version', payload => {
+  // console.log(payload)
+})
+
+peer.onCommand('sendcmpct', payload => {
+  console.log('sendcmpct', payload)
+})
+
+peer.onCommand('feefilter', payload => {
+  console.log('feefilter', payload)
+})
+
+peer.onCommand('inv', payload => {
+  console.log(payload)
+  peer.send('getdata', payload)
+
+  payload.forEach(({type, hash}) => {
+    switch (type) {
+      case 'MSG_BLOCK': {
+        console.log(hash)
+        break
+      }
+      default: {
+        console.log('inv:', type, hash)
+      }
+    }
+  })
+})
+
+peer.onCommand('ping', payload => {
+  peer.send('pong', payload)
+})
+
+peer.onCommand('block', payload => {
+  // const block = bitcoin.Block.fromBuffer(payload)
+  // console.log(block)
+  console.log(payload)
+})
+
+peer.send('verack')
+
