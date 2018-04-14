@@ -1,9 +1,4 @@
-const {PacketDecoder} = require('../../chap-encode/packet-decoder')
-const {PacketEncoder} = require('../../chap-encode/packet-encoder')
-
-const decodeVersion = (buf) => {
-  const decoder = new PacketDecoder(buf)
-
+const decodeVersion = (decoder) => {
   const version = decoder.uInt32()
   const services = decoder.uInt64()
   const time = decoder.uInt64()
@@ -27,8 +22,7 @@ const decodeVersion = (buf) => {
   }
 }
 
-const encodeVersion = () => {
-  const encoder = new PacketEncoder()
+const encodeVersion = (encoder) => {
   encoder.uInt32(70015)
 
   encoder.uInt64(0)
@@ -56,7 +50,6 @@ const encodeVersion = () => {
 
   encoder.uInt32(0)
   encoder.int8(0)
-  return encoder.build()
 }
 
 module.exports = {
