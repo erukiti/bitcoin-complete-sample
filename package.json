@@ -9,7 +9,9 @@
   "author": "",
   "license": "CC0",
   "dependencies": {
-    "bitcoin-core": "^2.0.0"
+    "bitcoin-core": "^2.0.0",
+    "openssl-wrapper": "^0.3.4",
+    "secp256k1": "^3.5.0"
   },
   "devDependencies": {
     "@types/jest": "^22.2.2",
