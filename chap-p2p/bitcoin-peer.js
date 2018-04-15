@@ -2,6 +2,8 @@ const assert = require('assert')
 const {EventEmitter} = require('events')
 const net = require('net')
 
+const defaultConf = require('../conf.json')
+
 const {PacketEncoder} = require('../chap-encode/packet-encoder')
 const {PacketDecoder} = require('../chap-encode/packet-decoder')
 
@@ -40,7 +42,7 @@ class BitcoinPeer {
   constructor() {
     this._magic = 0xdab5bffa
     this._host = '127.0.0.1'
-    this._port = 18444
+    this._port = defaultConf.port
 
     this._socket = net.connect(this._port, this._host)
     this._ev = new EventEmitter()
@@ -50,7 +52,7 @@ class BitcoinPeer {
     let buf = Buffer.from([])
 
     this._socket.on('connect', () => console.log('connected'))
-    this._socket.on('close', hadError => console.log('close', hadError))
+    this._socket.on('close', hadError => console.log('closed', hadError ? 'error' : ''))
 
     this._socket.on('data', data => {
       // console.log('received:', buf.length, data.length)
@@ -61,20 +63,20 @@ class BitcoinPeer {
           new PacketDecoder(buf.slice(0, HEADER_LENGTH))
         )
 
-        // console.log(header.command, header.payloadLength)
         if (buf.length < HEADER_LENGTH + header.payloadLength) {
           return
         }
 
         if (!(header.command in payloadDecoders)) {
           console.log(
-            `unknown: ${header.command}`,
+            `#unknown: ${header.command}`,
             buf
               .slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)
               .toString('hex')
           )
-          process.exit(0)
+          // process.exit(0)
         } else {
+          console.log('#received:', header.command)
           // console.log(headerPayloadCodecs[header.command](buf.slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)))
           const decoder = new PacketDecoder(
             buf.slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)
@@ -105,7 +107,7 @@ class BitcoinPeer {
   send(command, payload = {}) {
     assert(command in payloadEncoders)
 
-    console.log('send:', command)
+    console.log('#send:', command)
     
     const encodePayload = (command, payload) => {
       const encoder = new PacketEncoder()

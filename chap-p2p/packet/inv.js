@@ -7,7 +7,7 @@ const decodeInv = decode => {
   const inventoryVector = []
   for (let i = 0; i < len; i++) {
     const data = {}
-    const type = decode.varInt()
+    const type = decode.uInt32()
     if (type >= 0 && type < invTypes.length) {
       data.type = invTypes[type]
     } else {
@@ -24,8 +24,8 @@ const encodeInv = (encode, inventoryVector) => {
   inventoryVector.forEach(inv => {
     const type = invTypes.findIndex(v => v === inv.type)
     assert(type > 0 && type < invTypes.length)
-    encode.varInt(type)
-    encode.data(Buffer.from(inv.hash))
+    encode.uInt32(type)
+    encode.data(Buffer.from(inv.hash, 'hex'))
   })
 }
 

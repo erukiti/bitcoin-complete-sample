@@ -4,32 +4,30 @@ const {BitcoinPeer} = require('../chap-p2p/bitcoin-peer')
 const {encodeVersion} = require('../chap-p2p/packet/version')
 
 const peer = new BitcoinPeer()
-peer.send('version', {})
-
 peer.onCommand('version', payload => {
   // console.log(payload)
 })
 
 peer.onCommand('sendcmpct', payload => {
-  console.log('sendcmpct', payload)
+  console.log('  sendcmpct', payload)
 })
 
 peer.onCommand('feefilter', payload => {
-  console.log('feefilter', payload)
+  console.log('  feefilter', payload)
 })
 
 peer.onCommand('inv', payload => {
-  console.log(payload)
+  console.log('  inv', payload)
   peer.send('getdata', payload)
 
   payload.forEach(({type, hash}) => {
     switch (type) {
       case 'MSG_BLOCK': {
-        console.log(hash)
+        console.log('  Block ID: ', hash)
         break
       }
       default: {
-        console.log('inv:', type, hash)
+        console.log('  inv:', type, hash)
       }
     }
   })
@@ -42,8 +40,10 @@ peer.onCommand('ping', payload => {
 peer.onCommand('block', payload => {
   // const block = bitcoin.Block.fromBuffer(payload)
   // console.log(block)
-  console.log('block', payload)
+  console.log('  block', payload)
 })
+
+peer.send('version', {})
 
 peer.send('verack')
 
