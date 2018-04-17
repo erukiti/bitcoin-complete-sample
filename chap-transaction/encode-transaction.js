@@ -1,21 +1,21 @@
 const { encodeVarInt } = require('../chap-encode/var-int')
-const { encodeUInt32 } = require('../chap-encode/fixed-int')
+const { encodeUInt32LE } = require('../chap-encode/fixed-int')
 
 const encodeTransaction = (txins, txouts, opts = {}) => {
   const version = opts.version || 1
   const locktime = opts.locktime || 0
   const buffers = []
 
-  buffers.push(encodeUInt32(version))
+  buffers.push(encodeUInt32LE(version))
   buffers.push(encodeVarInt(txins.length))
   txins.forEach(txin => {
     const hash = Buffer.from(txin.hash, 'hex').reverse()
     const script = Buffer.from(txin.script, 'hex')
     buffers.push(hash)
-    buffers.push(encodeUInt32(txin.index))
+    buffers.push(encodeUInt32LE(txin.index))
     buffers.push(encodeVarInt(script.length))
     buffers.push(script)
-    buffers.push(encodeUInt32(txin.sequence))
+    buffers.push(encodeUInt32LE(txin.sequence))
   })
   buffers.push(encodeVarInt(txouts.length))
   txouts.forEach(txout => {
@@ -25,7 +25,7 @@ const encodeTransaction = (txins, txouts, opts = {}) => {
     buffers.push(encodeVarInt(script.length))
     buffers.push(script)
   })
-  buffers.push(encodeUInt32(locktime))
+  buffers.push(encodeUInt32LE(locktime))
 
   return Buffer.concat(buffers)
 }

@@ -6,7 +6,7 @@ const decodeTransaction = buf => {
   const decoder = new PacketDecoder(buf)
   const tx = {}
 
-  tx.version = decoder.int32()
+  tx.version = decoder.int32LE()
   let nTxIns = decoder.varInt()
   const isSegWit = nTxIns === 0
 
@@ -19,10 +19,10 @@ const decodeTransaction = buf => {
   for (let i = 0; i < nTxIns; i++) {
     const txIn = {}
     txIn.hash = decoder.data(32).reverse().toString('hex')
-    txIn.index = decoder.uInt32()
+    txIn.index = decoder.uInt32LE()
     const scriptLength = decoder.varInt()
     txIn.script = decoder.data(scriptLength).toString('hex')
-    txIn.sequence = decoder.uInt32()
+    txIn.sequence = decoder.uInt32LE()
     tx.txIns.push(txIn)
   }
   const nTxOuts = decoder.varInt()
@@ -37,7 +37,7 @@ const decodeTransaction = buf => {
   if (isSegWit) {
     // FIXME witness
   }
-  tx.locktime = decoder.uInt32()
+  tx.locktime = decoder.uInt32LE()
   return tx
 }
 
