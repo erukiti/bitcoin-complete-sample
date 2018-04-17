@@ -9,21 +9,6 @@ const decodeUInt16BE = (buf, offset) => [buf.readUInt16BE(offset), 2]
 const decodeInt32BE = (buf, offset) => [buf.readInt32BE(offset), 4]
 const decodeUInt32BE = (buf, offset) => [buf.readUInt32BE(offset), 4]
 
-// FIXME
-// const decodeInt64 = (buf, offset) => {
-//   let n = buf.readUInt32LE(offset)
-//   n |= buf.readUInt32LE(offset + 4) << 32
-//   return [n, 8]
-// }
-// const decodeUInt64 = decodeInt64
-
-// const decodeInt64BE = (buf, offset) => {
-//   let n = buf.readUInt32BE(offset) << 32
-//   n |= buf.readUInt32bE(offset + 4)
-//   return [n, 8]
-// }
-// const decodeUInt64BE = decodeInt64BE
-
 const encode = (size, func) => {
   const buf = Buffer.alloc(size)
   func(buf)
@@ -40,24 +25,6 @@ const encodeInt16BE = n => encode(2, buf => buf.writeInt16BE(n))
 const encodeUInt16BE = n => encode(2, buf => buf.writeUInt16BE(n))
 const encodeInt32BE = n => encode(4, buf => buf.writeInt32BE(n))
 const encodeUInt32BE = n => encode(4, buf => buf.writeUInt32BE(n))
-
-// const encodeInt64 = n => encode(8, buf => {
-//   buf.writeUInt32LE(n, 0)
-//   buf.writeUInt32LE(n / 2 ** 32 | 0, 4)
-// })
-// const encodeUInt64 = n => encode(8, buf => {
-//   buf.writeUInt32LE(n, 0)
-//   buf.writeUInt32LE(n / 2 ** 32 | 0, 4)
-// })
-// const encodeInt64BE = n => encode(8, buf => {
-//   buf.writeUInt32BE(n / 2 ** 32 | 0, 4)
-//   buf.writeUInt32BE(n, 0)
-// })
-// const encodeUInt64BE = n => encode(8, buf => {
-//   buf.writeUInt32BE(n / 2 ** 32 | 0, 4)
-//   buf.writeUInt32BE(n, 0)
-// })
-
 
 module.exports = {
   decodeInt8, decodeInt16LE, decodeInt32LE, // decodeInt64,

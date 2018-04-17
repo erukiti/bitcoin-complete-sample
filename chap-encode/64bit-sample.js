@@ -11,23 +11,20 @@ const complement = n => {
 }
 
 const readInt64LE = buf => {
-  if ((buf.readUint32LE(4) & 0x80000000) === 0) {
+  if ((buf.readUInt32LE(4) & 0x80000000) === 0) {
     return readUInt64LE(buf)
   }
 
-  return complement(buf.readUInt32LE(0)) + 1 - complement(buf.readUInt32LE(4)) * 2 ** 32
+  return -(complement(buf.readUInt32LE(0)) + complement(buf.readUInt32LE(4)) * 2 ** 32 + 1)
 }
 
-// --> 1fffffffffffff
-
-// readInt64LE(Buffer.from('0000000000000000', 'hex'))
-// readInt64LE(Buffer.from('0000000000000000', 'hex'))
-console.log(readUInt64LE(Buffer.from('0000000000000000', 'hex'))) // 0
-console.log(readUInt64LE(Buffer.from('001fffffffffffff', 'hex'))) // JSのnumberで表現できる最大値
+console.log('#unsigned')
+console.log(readUInt64LE(Buffer.from('ffffffffffff1f00', 'hex'))) // JSのnumberで安全に表現できる最大値
+console.log(Number.MAX_SAFE_INTEGER, 'MAX_SAFE_INTEGER')
 console.log(readUInt64LE(Buffer.from('ffffffffffffffff', 'hex'))) // 2^64 (精度は落ちている)
-
-// Number.MAX_SAFE_INTEGER.toString(16) --> 1fffffffffffff
-
-console.log(readInt64LE(Buffer.from('0000000000000000', 'hex'))) // 0
-console.log(readInt64LE(Buffer.from('001fffffffffffff', 'hex'))) // JSのnumberで表現できる最大値
-console.log(readInt64LE(Buffer.from('ffffffffffffffff', 'hex'))) // 2^64 (精度は落ちている)
+console.log()
+console.log('#signed')
+console.log(readInt64LE(Buffer.from('ffffffffffff1f00', 'hex'))) // JSのnumberで安全に表現できる最大値
+console.log(readInt64LE(Buffer.from('ffffffffffffffff', 'hex'))) // -1
+console.log(readInt64LE(Buffer.from('010000000000e0ff', 'hex'))) // JSのnumberで安全に表現できる最小値
+console.log(Number.MIN_SAFE_INTEGER, 'MIN_SAFE_INTEGER')
