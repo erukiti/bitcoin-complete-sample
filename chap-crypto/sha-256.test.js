@@ -44,14 +44,5 @@ describe('sha256', () => {
     ).toEqual(
       '2d8c2f6d978ca21712b5f6de36c9d31fa8e96a4fa5d8ff8b0188dfb9e7c171bb'
     )
-
-    // it('', () => {
-    //   for (let len = 1; len < 1024; len++) {
-    //     const s = '*'.repeat(len)
-    //     const nodeSha256 = crypto.createHash('sha256')
-    //     nodeSha256.update(s, 'ascii')
-    //     expect(sha256(s)).toEqual(nodeSha256.digest())
-    //   }
-    // })
   })
 })
