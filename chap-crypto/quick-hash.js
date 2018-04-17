@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const createHash = algorithm => buf => {
   const hash = crypto.createHash(algorithm)
   hash.write(buf)
-  return hash.digest().toString('hex')
+  return hash.digest()
 }
 const sha1 = createHash('sha1')
 const sha256 = createHash('sha256')

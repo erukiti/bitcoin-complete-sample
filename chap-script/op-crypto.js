@@ -1,7 +1,7 @@
 const assert = require('assert')
 
-const { ripemd160 } = require('../chap-crypto/ripemd-160')
-const { sha256 } = require('../chap-crypto/sha-256')
+const {hash160, hash256} = require('../chap-bitcoin-crypto/hash')
+const {sha1, sha256, ripemd160} = require('../chap-crypto/quick-hash')
 
 const registerOpCrypto = table => {
   table.push({
@@ -14,7 +14,12 @@ const registerOpCrypto = table => {
   })
   table.push({
     opCode: 0xa7,
-    mnemonic: ['SHA1']
+    mnemonic: ['SHA1'],
+    func: ({stack}) => {
+      assert(stack.length >= 1)
+      stack.push(sha1(stack.pop()))
+    }
+    
   })
 
   table.push({
@@ -30,7 +35,7 @@ const registerOpCrypto = table => {
     mnemonic: ['HASH160'],
     func: ({stack}) => {
       assert(stack.length >= 1)
-      stack.push(ripemd160(sha256(stack.pop())))
+      stack.push(hash160(stack.pop()))
     }
   })
   table.push({
@@ -38,7 +43,7 @@ const registerOpCrypto = table => {
     mnemonic: ['HASH256'],
     func: ({stack}) => {
       assert(stack.length >= 1)
-      stack.push(sha256(sha256(stack.pop())))
+      stack.push(hash256(stack.pop()))
     }
   })
   table.push({

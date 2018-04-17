@@ -1,6 +1,6 @@
-const {sha256} = require('../../chap-crypto/sha-256')
+const {hash256} = require('../../chap-bitcoin-crypto/hash')
 
-const getChechsum = (payload) => Buffer.from(sha256(Buffer.from(sha256(payload), 'hex')).slice(0, 8), 'hex')
+const getChechsum = (payload) => hash256(payload).slice(0, 4)
 
 const decodeCommand = (decoder) => {
   const buf = decoder.data(12)
@@ -26,7 +26,7 @@ const encodeHeader = (encoder, {magic, command, payload}) => {
   buf.write(command)
   encoder.data(buf)
   encoder.uInt32(payload.length)
-  encoder.data(Buffer.from(getChechsum(payload), 'ascii'))
+  encoder.data(getChechsum(payload))
 }
 
 module.exports = {

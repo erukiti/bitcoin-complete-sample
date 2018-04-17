@@ -3,6 +3,8 @@ const { registerOpConstant } = require('./op-constant')
 const table = []
 registerOpConstant(table)
 
+it('', () => {})
+
 // it('immidiate', () => {
 //   const stack = []
 //   expect(table[0x00](null, stack)).toEqual(0)

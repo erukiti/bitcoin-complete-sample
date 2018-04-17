@@ -4,7 +4,7 @@ describe('', () => {
   it('', () => {
     const version = '01000000'
     const txIns = '01'
-    const txIn0Hash =
+    const txIn0HashRev =
       '6dbddb085b1d8af75184f0bc01fad58d1266e9b63b50881990e4b40d6aee3629'
     const txIn0Index = '00000000'
     const txIn0Script =
@@ -29,7 +29,7 @@ describe('', () => {
     const rawTx =
       version +
       txIns +
-      txIn0Hash +
+      txIn0HashRev +
       txIn0Index +
       '8b' + // script size
       txIn0Script +
@@ -49,7 +49,7 @@ describe('', () => {
       version: 1,
       txIns: [
         {
-          hash: txIn0Hash,
+          hash: '2936ee6a0db4e4901988503bb6e966128dd5fa01bcf08451f78a1d5b08dbbd6d',
           index: 0,
           script: txIn0Script,
           sequence: 0xffffffff,
@@ -64,4 +64,11 @@ describe('', () => {
 
     expect(tx).toEqual(ex)
   })
+
+  it('', () => {
+    const rawTx = '020000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff03510101ffffffff0200f2052a010000002321023d64a1b2c6d7762b68437cd80b07182b98b55cee0ff26b8af859c8fb472cc1e7ac0000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf90120000000000000000000000000000000000000000000000000000000000000000000000000'
+    const tx = decodeTransaction(Buffer.from(rawTx, 'hex'))
+    // console.log(tx)
+  })
+
 })

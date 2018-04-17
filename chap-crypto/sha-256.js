@@ -1,13 +1,16 @@
+const assert = require('assert')
+
 const {createChunks} = require('./sha-256-chunk')
 const {compression} = require('./sha-256-compression')
 
 /**
  * 入力データのSHA-256ハッシュ値を得る
  * @param {Buffer} buf 
- * @returns {string} SHA-256を通したあとのHEX文字列
+ * @returns {Buffer} SHA-256ハッシュ値
  */
 const sha256 = buf => {
-  const chunks = createChunks((typeof buf === 'string') ? Buffer.from(buf, 'binary') : buf)
+  assert(buf instanceof Buffer)
+  const chunks = createChunks(buf)
 
   let hash = [
     0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
@@ -30,7 +33,7 @@ const sha256 = buf => {
   hash.forEach((h, index) => {
     result.writeInt32BE(h, index * 4)
   })
-  return result.toString('hex')
+  return result
 }
 
 module.exports = {

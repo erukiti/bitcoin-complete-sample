@@ -3,7 +3,6 @@ const alice = crypto.createECDH('secp256k1')
 const bob = crypto.createECDH('secp256k1')
 alice.generateKeys()
 bob.generateKeys()
-// const sha256 = crypto.createHash('sha256')
 
 const createTx = (key, to, value, prevHash = null) => {
   const message = JSON.stringify({to, value, prevHash})

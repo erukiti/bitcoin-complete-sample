@@ -14,6 +14,7 @@ const {decodePing, encodePing} = require('./packet/ping')
 const {decodeAddr} = require('./packet/addr')
 const {decodeFeefilter} = require('./packet/feefilter')
 const {decodeInv, encodeInv} = require('./packet/inv')
+const {decodeBlock} = require('../chap-block/decode-block')
 
 const nop = () => ({})
 const payloadDecoders = {
@@ -26,7 +27,8 @@ const payloadDecoders = {
   addr: decodeAddr,
   feefilter: decodeFeefilter,
   inv: decodeInv,
-  getdata: decodeInv
+  getdata: decodeInv,
+  block: decodeBlock
 }
 
 const payloadEncoders = {
@@ -38,56 +40,69 @@ const payloadEncoders = {
   getdata: encodeInv
 }
 
+const HEADER_LENGTH = 4 + 12 + 4 + 4
+
 class BitcoinPeer {
   constructor() {
+    this._ev = new EventEmitter()
+
     this._magic = 0xdab5bffa
     this._host = '127.0.0.1'
     this._port = defaultConf.port
 
-    this._socket = net.connect(this._port, this._host)
-    this._ev = new EventEmitter()
-
-    const HEADER_LENGTH = 4 + 12 + 4 + 4
-
-    let buf = Buffer.from([])
-
-    this._socket.on('connect', () => console.log('connected'))
-    this._socket.on('close', hadError => console.log('closed', hadError ? 'error' : ''))
-
-    this._socket.on('data', data => {
-      // console.log('received:', buf.length, data.length)
-      buf = Buffer.concat([buf, data])
-
-      while (buf.length >= HEADER_LENGTH) {
-        const header = decodeHeader(
-          new PacketDecoder(buf.slice(0, HEADER_LENGTH))
-        )
-
-        if (buf.length < HEADER_LENGTH + header.payloadLength) {
-          return
-        }
-
-        if (!(header.command in payloadDecoders)) {
-          console.log(
-            `#unknown: ${header.command}`,
-            buf
-              .slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)
-              .toString('hex')
+    this._conenct = new Promise((resolve, reject) => {
+      this._socket = net.connect(this._port, this._host)
+      this._socket.on('connect', () => {
+        console.log('connected.')
+        resolve()
+      })
+      this._socket.on('close', hadError => console.log('closed', hadError ? 'error' : ''))
+  
+      let buf = Buffer.from([])
+      this._socket.on('data', data => {
+        // console.log('received:', buf.length, data.length)
+        buf = Buffer.concat([buf, data])
+  
+        while (buf.length >= HEADER_LENGTH) {
+          const header = decodeHeader(
+            new PacketDecoder(buf.slice(0, HEADER_LENGTH))
           )
-          // process.exit(0)
-        } else {
-          console.log('#received:', header.command)
-          // console.log(headerPayloadCodecs[header.command](buf.slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)))
-          const decoder = new PacketDecoder(
-            buf.slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)
-          )
-          const payload = payloadDecoders[header.command](decoder)
-          this._ev.emit(`command-${header.command}`, payload)
+  
+          if (buf.length < HEADER_LENGTH + header.payloadLength) {
+            return
+          }
+  
+          if (!(header.command in payloadDecoders)) {
+            console.log(
+              `#unknown: ${header.command}`,
+              buf
+                .slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)
+                .toString('hex')
+            )
+            // process.exit(0)
+          } else {
+            console.log('#received:', header.command)
+            // console.log(headerPayloadCodecs[header.command](buf.slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)))
+            const decoder = new PacketDecoder(
+              buf.slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)
+            )
+            const payload = payloadDecoders[header.command](decoder)
+            this._ev.emit(`command-${header.command}`, payload)
+          }
+  
+          buf = buf.slice(HEADER_LENGTH + header.payloadLength)
         }
-
-        buf = buf.slice(HEADER_LENGTH + header.payloadLength)
-      }
+      })
+        
     })
+  }
+
+  /**
+   * connectを待つPromise
+   * @returns {Promise<void>}
+   */
+  async connect() {
+    return this._conenct
   }
 
   /**
@@ -122,6 +137,8 @@ class BitcoinPeer {
 
     const payloadBuf = encodePayload(command, payload)
     const header = _encodeHeader(command, payloadBuf)
+    // console.log(header.toString('hex'))
+    // console.log(payloadBuf.toString('hex'))
     this._socket.write(header)
     this._socket.write(payloadBuf)
   }

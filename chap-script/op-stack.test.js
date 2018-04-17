@@ -2,7 +2,7 @@ const { registerOpStack } = require('./op-stack')
 
 const table = []
 registerOpStack(table)
-
+it('', () => {})
 // describe('', () => {
 //   it('', () => {
 //     const stack = [1]

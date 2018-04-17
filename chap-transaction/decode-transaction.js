@@ -18,7 +18,7 @@ const decodeTransaction = buf => {
   tx.txIns = []
   for (let i = 0; i < nTxIns; i++) {
     const txIn = {}
-    txIn.hash = decoder.data(32).toString('hex')
+    txIn.hash = decoder.data(32).reverse().toString('hex')
     txIn.index = decoder.uInt32()
     const scriptLength = decoder.varInt()
     txIn.script = decoder.data(scriptLength).toString('hex')

@@ -1,7 +1,6 @@
 const assert = require('assert')
 
-const { sha256 } = require('../chap-crypto/sha-256')
-const getHash = data => sha256(sha256(data))
+const {hash256} = require('../chap-bitcoin-crypto/hash')
 
 const getMerkleRootHash = (txIds) => {
   assert(txIds.length > 0)
@@ -17,7 +16,7 @@ const getMerkleRootHash = (txIds) => {
     } else {
       inputs.push(txIds[i + 1])
     }
-    hashs.push(getHash(Buffer.concat(inputs)))
+    hashs.push(hash256(Buffer.concat(inputs)))
   } 
   return getMerkleRootHash(hashs)
 }

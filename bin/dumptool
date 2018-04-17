@@ -5,7 +5,7 @@ const {encodeVersion} = require('../chap-p2p/packet/version')
 
 const peer = new BitcoinPeer()
 peer.onCommand('version', payload => {
-  // console.log(payload)
+  console.log(payload)
 })
 
 peer.onCommand('sendcmpct', payload => {
@@ -38,12 +38,16 @@ peer.onCommand('ping', payload => {
 })
 
 peer.onCommand('block', payload => {
-  // const block = bitcoin.Block.fromBuffer(payload)
-  // console.log(block)
-  console.log('  block', payload)
+  console.log('  block', JSON.stringify(payload, null, '  '))
 })
 
-peer.send('version', {})
+const body = async () => {
+  await peer.connect()
+  peer.send('version', {})
 
-peer.send('verack')
+  peer.send('verack')
+  
+}
+
+body()
 

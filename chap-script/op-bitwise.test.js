@@ -3,6 +3,8 @@ const { registerOpBitwise } = require('./op-bitwise')
 const table = []
 registerOpBitwise(table)
 
+it('', () => {})
+
 // it('', () => {
 //   const stack = [1, 1]
 //   expect(table[0x87](null, stack)).toEqual(0)
