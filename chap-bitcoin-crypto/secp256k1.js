@@ -1,4 +1,4 @@
-const {sha256} = require('./quick-hash')
+const {sha256} = require('./hash')
 
 const {randomBytes, createSign, createVerify} = require('crypto')
 const secp256k1 = require('secp256k1')

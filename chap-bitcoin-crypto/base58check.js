@@ -1,7 +1,6 @@
 const assert = require('assert')
 
-const {sha256} = require('../chap-crypto/quick-hash')
-const {hash160, hash256} = require('./hash')
+const {hash160, hash256, sha256} = require('./hash')
 const {base58Encode, base58Decode} = require('./base58')
 
 const getChecksum = buf => {
