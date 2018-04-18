@@ -1,4 +1,9 @@
-const decodeVarInt = (buf, offset = 0) => {
+/**
+ * 
+ * @param {Buffer} buf 
+ * @param {number} offset 
+ */
+const decodeVarInt = (buf, offset) => {
   const firstByte = buf.readUInt8(offset)
   switch (firstByte) {
     case 0xfd: return [buf.readUInt16LE(offset + 1), 3]
@@ -10,6 +15,10 @@ const decodeVarInt = (buf, offset = 0) => {
   }
 }
 
+/**
+ * 
+ * @param {number} n 
+ */
 const encodeVarInt = n => {
   let buf
   if (n <= 0xfc) {

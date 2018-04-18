@@ -1,83 +1,71 @@
-const assert = require('assert')
+const Client = require('bitcoin-core')
 
-const {splitBytecode} = require('../chap-script/split-bytecode')
-const {disassebleBytecode} = require('../chap-script/disassemble')
-const {encodeTransaction} = require('./encode-transaction')
+const conf = require('../conf.json')
+const {decodeTransaction} = require('./decode-transaction')
 
-const {base58Decode} = require('../chap-bitcoin-crypto/base58')
+const cl = new Client({
+  network: 'testnet',
+  username: conf.user,
+  password: conf.pass,
+  port: conf.rpcport,
+})
 
-const unlockers = [
-  scriptChunks => {
-    if (
-      scriptChunks.length !== 5 ||
-      scriptChunks[0] !== 'OP_DUP' ||
-      scriptChunks[1] !== 'OP_HASH160' ||
-      scriptChunks[2].length !== 40 ||
-      scriptChunks[3] !== 'OP_EQUALVERIFY' ||
-      scriptChunks[4] !== 'OP_CHECKSIG'
-    ) {
-      return null
-    }
+const testBitcoinCore = async () => {
+  const firstBlockIds = await cl.generate(1)
+  const firstBlock = await cl.getBlock(firstBlockIds[0])
+  const firstCoinbaseId = firstBlock.tx[0]
+  const firstCoinbaseHex = await cl.getRawTransaction(firstCoinbaseId)
+  // console.log(decodeTransaction(Buffer.from(firstCoinbaseHex, 'hex')))
 
-    return {
-      name: 'P2PKH',
-      createScript: () => {
-        // scriptChunks[2]
-      }
-    }
-  },
-  scriptChunks => {
-    if (
-      scriptChunks.length !== 3 ||
-      scriptChunks[0] !== 'OP_HASH160' ||
-      scriptChunks[1].length !== 40 ||
-      scriptChunks[2] !== 'OP_EQUAL'
-    ) {
-      return null
-    }
-    return {
-      name: 'P2SH',
-      createScript: () => {
+  const myAddress = await cl.getAccountAddress('')
+  console.log(await cl.dumpPrivKey(myAddress))
 
-      }
-    }
-  },
-  scriptChunks => {
-    if (scriptChunks.length !== 2 && scriptChunks[1] !== 'OP_CHECKSIG') {
-      return null
-    }
-    return {
-      name: 'P2PK',
-      createScript: () => {
+/*
+  console.log('#decodeRawTransaction <TxHex>')
+  const firstCoinbaseTx = await cl.decodeRawTransaction(firstCoinbaseHex)
+  console.log(firstCoinbaseTx)
+  console.log()
 
-      }
-    }
+  console.log('#getNewAddress hoge 1')
+  const address = await cl.getNewAddress('hoge')
+  console.log(address)
+  try {
+    await cl.sendToAddress(address, 1)
+  } catch (e) {
+    console.log(e.code)
+    console.log(e.message)
   }
-]
+  console.log()
 
-const guessScript = script => {
-  assert(script instanceof Buffer)
-  const scriptChunks = disassebleBytecode(script).split(' ')
-  const found = unlockers.find(unlocker => unlocker(scriptChunks))
-  if (found) {
-    return found(scriptChunks)
-  }
-  return null
+  console.log('#generate 100')
+  await cl.generate(100)
+  console.log()
+
+  console.log('#sendToAddress hoge 1')
+  const sendTxId = await cl.sendToAddress(address, 1)
+  console.log(sendTxId)
+  console.log()
+
+  console.log('#getRawTransaction <TxId>')
+  const sendTxHex = await cl.getRawTransaction(sendTxId)
+  console.log()
+
+  console.log('#decodeRawTransaction <TxHex>')
+  const sendTx = await cl.decodeRawTransaction(sendTxHex)
+  console.log(sendTx)
+  console.log()
+
+  console.log('#getBalance hoge')
+  console.log(await cl.getBalance('hoge'))
+  console.log()
+
+  console.log('#generate 1')
+  await cl.generate(1)
+  console.log()
+
+  console.log('#getBalance hoge')
+  console.log(await cl.getBalance('hoge'))
+*/
 }
 
-const createTransaction = (vins, vouts, opts = {}) => {
-  const version = opts.version || 2
-  const locktime = opts.locktime || 0
-
-  vins.forEach(txIn => {
-    console.log(txIn.keypair.publicKey.toString('hex'))
-    const found = guessScript(Buffer.from(txIn.script, 'hex'))
-    console.log(found)
-  })
-
-  // return encodeTransaction(vins, vouts, {version, locktime})
-}
-
-module.exports = {
-  createTransaction,
-}
+testBitcoinCore().catch(err => console.error(err))

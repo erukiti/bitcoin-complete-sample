@@ -2,13 +2,14 @@ const assert = require('assert')
 
 const varInt = require('./var-int')
 const fixedInt = require('./fixed-int')
-const varStr = require('./var-str')
+const varStr = require('./var-buffer')
 
 class PacketDecoder {
   /**
    * @param {Buffer} buf デコード対象のバイナリデータ
    */
   constructor(buf) {
+    assert(buf instanceof Buffer)
     this._buf = buf
     this._offset = 0
     const codec = {...varInt, ...fixedInt, ...varStr}

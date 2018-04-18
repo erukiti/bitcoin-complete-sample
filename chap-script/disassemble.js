@@ -2,21 +2,9 @@ const assert = require('assert')
 
 const {splitBytecode} = require('./split-bytecode')
 
-const {registerOpArithmetic} = require('./op-arithmetic')
-const {registerOpBitwise} = require('./op-bitwise')
-const {registerOpConstant} = require('./op-constant')
-const {registerOpFlow} = require('./op-flow')
-const {registerOpStack} = require('./op-stack')
-const {registerOpCrypto} = require('./op-crypto')
 
 const createLookup = () => {
   const table = []
-  registerOpArithmetic(table)
-  registerOpBitwise(table)
-  registerOpConstant(table)
-  registerOpCrypto(table)
-  registerOpFlow(table)
-  registerOpStack(table)
 
   const lookup = Array(256).fill('UNKNOWN-OPCODE')
   table.forEach(entry => {

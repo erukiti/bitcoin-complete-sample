@@ -1,4 +1,12 @@
+const assert = require('assert')
+
+/**
+ * バイトコードをオペコードとスタックに積まれるデータに分離する
+ * @param {Buffer} buf
+ * @returns {Array<number | Buffer>} 整数かBufferオブジェクトのどちらかが入った配列。整数ならそれはオペコード
+ */
 const splitBytecode = buf => {
+  assert(buf instanceof Buffer)
   const result = []
   let offset = 0
   while (offset < buf.length) {

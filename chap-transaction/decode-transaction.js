@@ -3,6 +3,7 @@ const assert = require('assert')
 const { PacketDecoder } = require('../chap-encode/packet-decoder')
 
 const decodeTransaction = buf => {
+  assert(buf instanceof Buffer)
   const decoder = new PacketDecoder(buf)
   const tx = {}
 

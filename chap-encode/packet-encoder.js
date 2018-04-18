@@ -2,7 +2,7 @@ const assert = require('assert')
 
 const varInt = require('./var-int')
 const fixedInt = require('./fixed-int')
-const varStr = require('./var-str')
+const varStr = require('./var-buffer')
 
 
 class PacketEncoder {
