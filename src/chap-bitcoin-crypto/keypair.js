@@ -157,6 +157,12 @@ class Keypair {
     }
     return encodeBase58Check(Buffer.concat(ar))
   }
+
+  sign(buf) {
+    const sig = secp256k1.sign(buf, this.privateKey).signature
+    console.log(sig.toString('hex'))
+    return sig
+  }
 }
 
 module.exports = {

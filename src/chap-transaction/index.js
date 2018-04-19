@@ -11,7 +11,6 @@ class Transaction {
   constructor(decoder) {
     assert(decoder instanceof PacketDecoder)
     // console.log(buf.toString('hex'))
-    assert(buf instanceof Buffer, `${util.inspect(buf)} is not Buffer`)
     this._raw = decoder.toBuffer()
     this._tx = decodeTransaction(decoder)
     // console.log(this.calcHash())
@@ -20,6 +19,10 @@ class Transaction {
   calcHash() {
     const tx = {...this._tx, isSegwit: false}
     return hash256(encodeTransaction(tx)).toString('hex')
+  }
+
+  static encode(tx) {
+    return new Transaction(PacketDecoder.fromBuffer(encodeTransaction(tx)))
   }
 
   /**

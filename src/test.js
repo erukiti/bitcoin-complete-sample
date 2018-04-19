@@ -23,7 +23,9 @@ const {decodeBase58Check, encodeBase58Check} = require('./chap-bitcoin-crypto/ba
 const {decodeBlock} = require('./chap-block/decode-block')
 const {PacketDecoder} = require('./chap-encode/packet-decoder')
 const {Block} = require('./chap-block/block')
+const {BTC} = require('./chap-transaction/btc')
 
+const keys = []
 
 const cl = new Client({
   network: 'testnet',
@@ -34,55 +36,52 @@ const cl = new Client({
 
 const createAccount = async name => {
   const kp = Keypair.generate({network: 'testnet'})
-  await cl.importPrivKey(kp.toWIF())
-  console.log(name, kp.toAddress())
-  await cl.setAccount(kp.toAddress(), name)
+  console.log(kp.toAddress())
+  // keys.push(kp)
+  // await cl.importPrivKey(kp.toWIF())
+  // console.log(name, kp.toAddress())
+  // await cl.setAccount(kp.toAddress(), name)
   return kp
 }
 
 const txDB = new TxDB({
   txFetcher: async txId => {
     const txHex = await cl.getRawTransaction(txId)
-    const tx = Transaction.fromHex(txHex)
-    return tx
+    return Transaction.fromHex(txHex)
   },
   blockFetcher: async blockId => {
     const blockHex = await cl.getBlock(blockId, 0)
-    console.log(blockId)
     return Block.fromHex(blockHex)
   }
 })
 
-const sendToP2PKH = (keypair, utxo, address, value) => {
+const sendToP2PKH = (utxo, address, value) => {
   const txIns = [
     {
       hash: utxo.hash,
       index: utxo.index,
       sequence: 0xfffffffe,
-      script: Buffer.from([]),
+      script: utxo.script,
     },
   ]
-  const sendHash = decodeBase58Check(address).slice(1)
+  const sendHash = Keypair.fromWIF(address).toPubkeyHash()
   const txOuts = [
     {
-      value: '80b89a3b00000000',
+      value: BTC.fromBTC(49.99999),
       script: Script.asm`OP_DUP OP_HASH160 ${sendHash} OP_EQUALVERIFY OP_CHECKSIG`,
-    },
-    {
-      value: '00ca9a3b00000000',
-      script: Buffer.from(
-        '76a9144add84e847d80efd033a0e7201abc26e23ab1efe88ac',
-        'hex'
-      ),
-    },
+    }
   ]
 
-  const tmpTx = encodeTransaction(txIns, txOuts, {version: 2})
-  const sigHash = hash256(tmpTx)
-  const sign = secp256k1.sign(sigHash, keypair.privateKey).signature //secp256k1.signatureExport(
-  // )
-  txIns[0].script = Script.asm`${sign} ${keypair.publicKey}`
-  return encodeTransaction(txIns, txOuts, {version: 2})
+  const tmpTx = Transaction.encode({txIns, txOuts, version: 2})
+  // console.log(tmpTx)
+
+  const sigHash = hash256(tmpTx.toBuffer())
+  const sign = Buffer.concat([
+    secp256k1.signatureExport(secp256k1.sign(sigHash, utxo.key.privateKey).signature),
+    Buffer.from([0x01, 0, 0, 0])
+  ])
+  txIns[0].script = Script.asm`${sign}`
+  return encodeTransaction({txIns, txOuts, version: 2})
 }
 
 const putBalance = async name => {
@@ -93,9 +92,19 @@ const generate = async n => {
   const txs = []
   const blockIds = await cl.generate(n)
   for (let blockId of blockIds) {
-    const block = await txDB.fetchBlock(blockId)
-    console.log(block)
-    console.log(await cl.getBlock(blockId))
+    const b = await txDB.fetchBlock(blockId)
+    const block = await cl.getBlock(blockId)
+
+
+
+    for (let txId of block.tx) {
+      await txDB.fetchTransaction(txId)
+      const tx = await cl.getTransaction(txId)
+      for (let detail of tx.details) {
+        const wif = await cl.dumpPrivKey(detail.address)
+        keys.push(Keypair.fromWIF(wif))
+      }
+    }
   }
 }
 
@@ -104,25 +113,38 @@ const testBitcoinCore = async () => {
 
   await generate(1)
 
-  const addr = await cl.getAccountAddress('')
-  const wif = await cl.dumpPrivKey(addr)
-  const myKey = Keypair.fromWIF(wif)
-  console.log(myKey.toAddress(), myKey.toPublicKey().toString('hex'))
-
   const alice = await createAccount('alice')
-  const bob = await createAccount('bob')
+  // const bob = await createAccount('bob')
+
+  const utxos = txDB.searchTransaction(keys)
+
+  await generate(100)
+
+  const sendTx = sendToP2PKH(utxos[0], alice.toAddress(), 10)
+  console.log(1, Transaction.fromBuffer(sendTx))
+
+  // const a = bc.ECPair.fromWIF(utxos[0].key.toWIF(), bc.networks.testnet)
+  
+  // const txb = new bc.TransactionBuilder({network: bc.networks.testnet})
+  // txb.addInput(utxos[0].hash, utxos[0].index)
+  // console.log(a.getAddress())
+  // txb.addOutput(a.getAddress(), 49.9999)
+  // txb.sign(0, a)
+  // console.log(2, txb.build().toHex())
 
 
-  txDB.searchTransaction(myKey)
 
+  // console.log(await cl.sendRawTransaction(sendTx.toString('hex')))
 
-  // putBalance('alice')
+  putBalance('alice')
 
-  // const txId = await cl.sendToAddress(alice.toAddress(), 40)
-  // console.log(txId)
-  // const tx = await txDB.fetchTransaction(txId)
+  const txId = await cl.sendToAddress(alice.toAddress(), 40)
+  await cl.generate(1)
+  console.log(txId)
+  const tx = await txDB.fetchTransaction(txId)
+  console.log(tx)
 
-  // putBalance('alice')
+  putBalance('alice')
 
 
   // tx.txOuts.forEach((txOut, index) => {

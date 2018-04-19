@@ -1,4 +1,5 @@
 const assert = require('assert')
+
 const {Transaction} = require('./index')
 const {Keypair} = require('../chap-bitcoin-crypto/keypair')
 const {guessScript} = require('../chap-script/unlock')
@@ -27,8 +28,8 @@ class TxDB {
     return this._block[blockId]
   }
 
-  searchTransaction(key) {
-    console.log(key.toPublicKey())
+  searchTransaction(keys) {
+    const utxos = []
     Object.keys(this._tx).forEach(txId => {
       const tx = this._tx[txId]
       tx.txOuts.forEach((txOut, index) => {
@@ -38,15 +39,28 @@ class TxDB {
         }
         switch (res.name) {
           case 'P2PK': {
-            const kp = Keypair.fromPublicKey(Buffer.from(res.pubkey, 'hex'), {network: 'testnet'})
-            console.log(kp.toAddress())
+            const key = keys.find(v => v.toPublicKey().toString('hex') === res.pubkey)
+            if (!key) {
+              console.log('pubkey', txId, index, res.pubkey)
+              return
+            }
+
+            utxos.push({
+              key,
+              hash: Buffer.from(txId, 'hex'),
+              index,
+              script: txOut.script,
+              type: res.name
+            })
+            return
           }
           default: {
-            console.log(res)
+            console.log('unknown', res)
           }
         }
       })
     })
+    return utxos
   }
 
 

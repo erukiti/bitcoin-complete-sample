@@ -29,6 +29,7 @@ class Block {
 
   inspect() {
     return {
+      id: this._block.id.toString('hex'),
       version: this._block.version.toString(16),
       prevBlock: this._block.prevBlock.toString('hex'),
       merkleRoot: this._block.merkleRoot.toString('hex'),

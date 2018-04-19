@@ -2,6 +2,7 @@ const assert = require('assert')
 
 const {PacketDecoder} = require('../chap-encode/packet-decoder')
 const {Script} = require('../chap-script/script')
+const {BTC} = require('./btc')
 
 /**
  * 
@@ -17,7 +18,7 @@ const decodeTransaction = decoder => {
 
   if (tx.isSegWit) {
     const flag = decoder.int8()
-    assert(flag !== 0)
+    assert(flag === 1)
     nTxIns = decoder.varInt()
   }
   tx.txIns = []
@@ -34,7 +35,7 @@ const decodeTransaction = decoder => {
   tx.txOuts = []
   for (let i = 0; i < nTxOuts; i++) {
     const txOut = {}
-    txOut.value = decoder.data(8)
+    txOut.value = BTC.fromBuffer(decoder.data(8))
     const scriptLength = decoder.varInt()
     txOut.script = new Script(decoder.data(scriptLength))
     tx.txOuts.push(txOut)

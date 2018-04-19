@@ -29,7 +29,7 @@ class PacketDecoder {
    * 
    * @param {Buffer} buf 
    */
-  static formBuffer(buf) {
+  static fromBuffer(buf) {
     assert(buf instanceof Buffer)
     return new PacketDecoder(buf)
   }
