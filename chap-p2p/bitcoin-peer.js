@@ -28,7 +28,7 @@ const payloadDecoders = {
   feefilter: decodeFeefilter,
   inv: decodeInv,
   getdata: decodeInv,
-  block: decodeBlock
+  block: decodeBlock,
 }
 
 const payloadEncoders = {
@@ -37,7 +37,7 @@ const payloadEncoders = {
   ping: encodePing,
   pong: encodePing,
   inv: encodeInv,
-  getdata: encodeInv
+  getdata: encodeInv,
 }
 
 const HEADER_LENGTH = 4 + 12 + 4 + 4
@@ -56,22 +56,24 @@ class BitcoinPeer {
         console.log('connected.')
         resolve()
       })
-      this._socket.on('close', hadError => console.log('closed', hadError ? 'error' : ''))
-  
+      this._socket.on('close', hadError =>
+        console.log('closed', hadError ? 'error' : '')
+      )
+
       let buf = Buffer.from([])
       this._socket.on('data', data => {
         // console.log('received:', buf.length, data.length)
         buf = Buffer.concat([buf, data])
-  
+
         while (buf.length >= HEADER_LENGTH) {
           const header = decodeHeader(
             new PacketDecoder(buf.slice(0, HEADER_LENGTH))
           )
-  
+
           if (buf.length < HEADER_LENGTH + header.payloadLength) {
             return
           }
-  
+
           if (!(header.command in payloadDecoders)) {
             console.log(
               `#unknown: ${header.command}`,
@@ -89,11 +91,10 @@ class BitcoinPeer {
             const payload = payloadDecoders[header.command](decoder)
             this._ev.emit(`command-${header.command}`, payload)
           }
-  
+
           buf = buf.slice(HEADER_LENGTH + header.payloadLength)
         }
       })
-        
     })
   }
 
@@ -123,7 +124,7 @@ class BitcoinPeer {
     assert(command in payloadEncoders)
 
     console.log('#send:', command)
-    
+
     const encodePayload = (command, payload) => {
       const encoder = new PacketEncoder()
       payloadEncoders[command](encoder, payload)

@@ -1,13 +1,15 @@
 /**
- * 
- * @param {Buffer} buf 
- * @param {number} offset 
+ *
+ * @param {Buffer} buf
+ * @param {number} offset
  */
 const decodeVarInt = (buf, offset) => {
   const firstByte = buf.readUInt8(offset)
   switch (firstByte) {
-    case 0xfd: return [buf.readUInt16LE(offset + 1), 3]
-    case 0xfe: return [buf.readUInt32LE(offset + 1), 5]
+    case 0xfd:
+      return [buf.readUInt16LE(offset + 1), 3]
+    case 0xfe:
+      return [buf.readUInt32LE(offset + 1), 5]
     case 0xff: //FIXME
       return [buf.readUInt32LE(offset + 1), 9]
     default:
@@ -16,8 +18,8 @@ const decodeVarInt = (buf, offset) => {
 }
 
 /**
- * 
- * @param {number} n 
+ *
+ * @param {number} n
  */
 const encodeVarInt = n => {
   let buf
@@ -36,4 +38,4 @@ const encodeVarInt = n => {
   return buf
 }
 
-module.exports = { decodeVarInt, encodeVarInt }
+module.exports = {decodeVarInt, encodeVarInt}

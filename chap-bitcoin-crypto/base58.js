@@ -8,7 +8,7 @@ const CHARACTERS = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
  * @returns {string} Base58エンコードされた文字列
  */
 const base58Encode = buf => {
-  if (buf.length === 0) return ''
+  if (buf.length === 0) { return '' }
 
   const buf58 = baseConv(buf, 256, 58)
 
@@ -30,10 +30,7 @@ const base58Decode = base58String => {
   const base58Array = base58String.split('')
   const nPadding = base58Array.findIndex(c => c !== CHARACTERS[0])
   const source = base58Array.map(c => lookup[c])
-  return Buffer.from([
-    ...Array(nPadding).fill(0),
-    ...baseConv(source, 58, 256),
-  ])
+  return Buffer.from([...Array(nPadding).fill(0), ...baseConv(source, 58, 256)])
 }
 
 module.exports = {

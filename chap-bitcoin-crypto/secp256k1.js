@@ -15,7 +15,7 @@ const generatePrivateKey = () => {
   }
 }
 
-const generatePublicKey = (privateKey) => {
+const generatePublicKey = privateKey => {
   return secp256k1.publicKeyCreate(privateKey)
 }
 
@@ -36,4 +36,3 @@ const pub = generatePublicKey(priv)
 
 // // verify the signature
 // console.log(secp256k1.verify(msg, sigObj.signature, pubKey))
-

@@ -8,7 +8,10 @@ describe('', () => {
   })
 
   it('', () => {
-    expect(encodeBase58Check(Buffer.from('00010966776006953d5567439e5e39f86a0d273bee', 'hex'))).toEqual('16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM')
+    expect(
+      encodeBase58Check(
+        Buffer.from('00010966776006953d5567439e5e39f86a0d273bee', 'hex')
+      )
+    ).toEqual('16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM')
   })
-
 })

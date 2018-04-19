@@ -15,7 +15,11 @@ const readInt64LE = buf => {
     return readUInt64LE(buf)
   }
 
-  return -(complement(buf.readUInt32LE(0)) + complement(buf.readUInt32LE(4)) * 2 ** 32 + 1)
+  return -(
+    complement(buf.readUInt32LE(0)) +
+    complement(buf.readUInt32LE(4)) * 2 ** 32 +
+    1
+  )
 }
 
 console.log('#unsigned')

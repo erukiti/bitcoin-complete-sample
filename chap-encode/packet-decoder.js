@@ -26,13 +26,30 @@ class PacketDecoder {
   }
 
   /**
+   * 
+   * @param {Buffer} buf 
+   */
+  static formBuffer(buf) {
+    assert(buf instanceof Buffer)
+    return new PacketDecoder(buf)
+  }
+
+  /**
+   * 
+   * @param {string} hex 
+   */
+  static fromHex(hex) {
+    return new PacketDecoder(Buffer.from(hex, 'hex'))
+  }
+
+  /**
    * lengthで指定した分のバイナリデータを取り出す
-   * @param {number} length 
+   * @param {number} length
    * @returns {Buffer}
    */
   data(length) {
     assert(typeof length === 'number')
-    assert(length > 0)
+    assert(length >= 0)
     const result = this._buf.slice(this._offset, this._offset + length)
     this._offset += length
     return result
@@ -45,8 +62,12 @@ class PacketDecoder {
   getLeft() {
     return this._buf.length - this._offset
   }
+
+  toBuffer() {
+    return this._buf
+  }
 }
 
 module.exports = {
-  PacketDecoder
+  PacketDecoder,
 }

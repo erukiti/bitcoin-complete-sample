@@ -1,17 +1,21 @@
 const assert = require('assert')
 
-const { PacketDecoder } = require('../chap-encode/packet-decoder')
+const {PacketDecoder} = require('../chap-encode/packet-decoder')
+const {Script} = require('../chap-script/script')
 
-const decodeTransaction = buf => {
-  assert(buf instanceof Buffer)
-  const decoder = new PacketDecoder(buf)
+/**
+ * 
+ * @param {PacketDecoder} decoder 
+ */
+const decodeTransaction = decoder => {
+  assert(decoder instanceof PacketDecoder)
   const tx = {}
 
   tx.version = decoder.int32LE()
   let nTxIns = decoder.varInt()
-  const isSegWit = nTxIns === 0
+  tx.isSegWit = nTxIns === 0
 
-  if (isSegWit) {
+  if (tx.isSegWit) {
     const flag = decoder.int8()
     assert(flag !== 0)
     nTxIns = decoder.varInt()
@@ -19,10 +23,10 @@ const decodeTransaction = buf => {
   tx.txIns = []
   for (let i = 0; i < nTxIns; i++) {
     const txIn = {}
-    txIn.hash = decoder.data(32).reverse().toString('hex')
+    txIn.hash = decoder.data(32).reverse()
     txIn.index = decoder.uInt32LE()
     const scriptLength = decoder.varInt()
-    txIn.script = decoder.data(scriptLength).toString('hex')
+    txIn.script = new Script(decoder.data(scriptLength))
     txIn.sequence = decoder.uInt32LE()
     tx.txIns.push(txIn)
   }
@@ -30,18 +34,25 @@ const decodeTransaction = buf => {
   tx.txOuts = []
   for (let i = 0; i < nTxOuts; i++) {
     const txOut = {}
-    txOut.value = decoder.data(8).toString('hex')
+    txOut.value = decoder.data(8)
     const scriptLength = decoder.varInt()
-    txOut.script = decoder.data(scriptLength).toString('hex')
+    txOut.script = new Script(decoder.data(scriptLength))
     tx.txOuts.push(txOut)
   }
-  if (isSegWit) {
-    // FIXME witness
+  if (tx.isSegWit) {
+    for (let i = 0; i < tx.txIns.length; i++) {
+      const count = decoder.varInt()
+      const vector = []
+      for (let j = 0; j < count; j++) {
+        vector.push(decoder.varBuffer())
+      }
+      tx.txIns.witnesses = vector
+    }    
   }
   tx.locktime = decoder.uInt32LE()
   return tx
 }
 
 module.exports = {
-  decodeTransaction
+  decodeTransaction,
 }

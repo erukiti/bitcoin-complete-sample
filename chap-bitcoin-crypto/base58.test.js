@@ -10,6 +10,8 @@ describe('base58 encoding', () => {
 
   it('decode', () => {
     const res = base58Decode('16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM')
-    expect(res.toString('hex')).toBe('00010966776006953d5567439e5e39f86a0d273beed61967f6')
+    expect(res.toString('hex')).toBe(
+      '00010966776006953d5567439e5e39f86a0d273beed61967f6'
+    )
   })
 })

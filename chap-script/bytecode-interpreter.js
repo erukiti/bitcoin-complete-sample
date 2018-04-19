@@ -1,7 +1,7 @@
 let bytecode = Buffer.from('0123014593', 'hex')
 const stack = []
 
-while(bytecode.length > 0) {
+while (bytecode.length > 0) {
   const opCode = bytecode.readUInt8(0)
   bytecode = bytecode.slice(1)
   switch (opCode) {

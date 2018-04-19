@@ -16,7 +16,9 @@ class VM {
         this._op[op.opCode] = op.func
         assert(Array.isArray(op.mnemonic))
         if (op.mnemonic.length > 0) {
-          this._mnemonic[op.opCode] = op.mnemonic.map(mnemonic => `OP_${mnemonic}`)
+          this._mnemonic[op.opCode] = op.mnemonic.map(
+            mnemonic => `OP_${mnemonic}`
+          )
         }
       })
     }
@@ -62,7 +64,7 @@ class VM {
   }
 
   run() {
-    while (this.step() > 0);
+    while (this.step() > 0) {; }
   }
 }
 

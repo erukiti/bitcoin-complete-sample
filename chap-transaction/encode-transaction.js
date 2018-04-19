@@ -1,33 +1,44 @@
-const { encodeVarInt } = require('../chap-encode/var-int')
-const { encodeUInt32LE } = require('../chap-encode/fixed-int')
+const assert = require('assert')
 
-const encodeTransaction = (txins, txouts, opts = {}) => {
-  const version = opts.version || 1
-  const locktime = opts.locktime || 0
-  const buffers = []
+const {PacketEncoder} = require('../chap-encode/packet-encoder')
 
-  buffers.push(encodeUInt32LE(version))
-  buffers.push(encodeVarInt(txins.length))
-  txins.forEach(txin => {
-    const hash = Buffer.from(txin.hash, 'hex').reverse()
-    const script = Buffer.from(txin.script, 'hex')
-    buffers.push(hash)
-    buffers.push(encodeUInt32LE(txin.index))
-    buffers.push(encodeVarInt(script.length))
-    buffers.push(script)
-    buffers.push(encodeUInt32LE(txin.sequence))
+/**
+ * 
+ * @param {packetEncoder} encoder 
+ * @param {object} tx 
+ */
+const encodeTransaction = (tx) => {
+  const encoder = new PacketEncoder()
+
+  encoder.uInt32LE(tx.version)
+  if (tx.isSegwit) {
+    encoder.uInt8(0)
+    encoder.uInt8(1)
+  }
+  encoder.varInt(tx.txIns.length)
+  tx.txIns.forEach(txIn => {
+    encoder.data(txIn.hash)
+    encoder.varBuffer(txIn.script.toBuffer())
+    encoder.uInt32LE(txIn.sequence)
   })
-  buffers.push(encodeVarInt(txouts.length))
-  txouts.forEach(txout => {
-    const script = Buffer.from(txout.script, 'hex')
-    // buffers.push() value 64bit
-    buffers.push(Buffer.from(txout.value, 'hex'))
-    buffers.push(encodeVarInt(script.length))
-    buffers.push(script)
+  encoder.varInt(tx.txOuts.length)
+  tx.txOuts.forEach(txOut => {
+    encoder.data(txOut.value)
+    encoder.varBuffer(txOut.script.toBuffer())
   })
-  buffers.push(encodeUInt32LE(locktime))
 
-  return Buffer.concat(buffers)
+  if (tx.isSegwit) {
+    tx.txIns.forEach(txIn => {
+      encoder.varInt(txIn.witness.length)
+      txIn.witnesses.forEach(witness => {
+        encoder.varBuffer(witness)
+      })
+    })
+  }
+
+  encoder.uInt32LE(tx.locktime)
+
+  return encoder.build()
 }
 
 module.exports = {

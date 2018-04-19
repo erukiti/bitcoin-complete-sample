@@ -1,4 +1,4 @@
-const { baseConv } = require('./base-conv')
+const {baseConv} = require('./base-conv')
 
 describe('baseConv', () => {
   it('', () => {

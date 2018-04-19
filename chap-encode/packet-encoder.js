@@ -4,7 +4,6 @@ const varInt = require('./var-int')
 const fixedInt = require('./fixed-int')
 const varStr = require('./var-buffer')
 
-
 class PacketEncoder {
   constructor() {
     this._buffers = []
@@ -13,7 +12,7 @@ class PacketEncoder {
       .filter(s => s.startsWith('encode'))
       .forEach(s => {
         const name = s.substr(6, 1).toLowerCase() + s.substr(7)
-        this[name] = (value) => {
+        this[name] = value => {
           this._buffers.push(codec[s](value))
         }
       })
@@ -38,5 +37,5 @@ class PacketEncoder {
 }
 
 module.exports = {
-  PacketEncoder
+  PacketEncoder,
 }
