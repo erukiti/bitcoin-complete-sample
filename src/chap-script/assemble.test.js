@@ -1,4 +1,4 @@
-const {asm} = require('./assembele')
+const {asm} = require('./assemble')
 
 it('', () => {
   const buf = Buffer.from('001122', 'hex')

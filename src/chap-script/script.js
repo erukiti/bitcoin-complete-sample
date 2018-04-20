@@ -1,6 +1,6 @@
 const assert = require('assert')
 
-const {asm} = require('./assembele')
+const {asm} = require('./assemble')
 const {disassebleBytecode} = require('./disassemble')
 
 class Script {
