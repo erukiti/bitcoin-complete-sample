@@ -41,7 +41,7 @@ const hash160 = buf => {
 }
 
 /**
- * 入力値のhash256を得る ※sha256 -> hash256
+ * 入力値のhash256を得る ※sha256 -> sha256
  * @param {Buffer} buf 入力データ
  * @returns {Buffer} hash256のハッシュ値（256ビット長）
  */
