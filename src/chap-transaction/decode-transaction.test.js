@@ -44,7 +44,7 @@ describe('', () => {
       txOut1Script +
       locktime
 
-    const tx = decodeTransaction(new PacketDecoder.fromHex(rawTx))
+    const tx = decodeTransaction(PacketDecoder.fromHex(rawTx))
 
     const ex = {
       version: 1,
@@ -68,7 +68,7 @@ describe('', () => {
 
   it('', () => {
     const rawTx = '020000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff03510101ffffffff0200f2052a010000002321023d64a1b2c6d7762b68437cd80b07182b98b55cee0ff26b8af859c8fb472cc1e7ac0000000000000000266a24aa21a9ede2f61c3f71d1defd3fa999dfa36953755c690689799962b48bebd836974e8cf90120000000000000000000000000000000000000000000000000000000000000000000000000'
-    const tx = decodeTransaction(Buffer.from(rawTx, 'hex'))
+    const tx = decodeTransaction(PacketDecoder.fromHex(rawTx))
     // console.log(tx)
   })
 

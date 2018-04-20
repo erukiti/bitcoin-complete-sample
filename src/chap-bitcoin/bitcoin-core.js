@@ -1,9 +1,9 @@
 const Client = require('bitcoin-core')
 
-const conf = require('../conf.json')
+const {conf} = require('../')
 
 const cl = new Client({
-  network: 'testnet',
+  network: conf.network,
   username: conf.user,
   password: conf.pass,
   port: conf.rpcport,

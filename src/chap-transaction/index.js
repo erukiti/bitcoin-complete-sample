@@ -6,19 +6,21 @@ const {hash256} = require('../chap-bitcoin-crypto/hash')
 const {decodeTransaction} = require('./decode-transaction')
 const {encodeTransaction} = require('./encode-transaction')
 const {PacketDecoder} = require('../chap-encode/packet-decoder')
+const {guessScript} = require('../chap-script/unlock')
+const {Keypair} = require('../chap-bitcoin-crypto/keypair')
 
 class Transaction {
   constructor(decoder) {
     assert(decoder instanceof PacketDecoder)
     // console.log(buf.toString('hex'))
     this._raw = decoder.toBuffer()
+    this._id = hash256(this._raw).reverse()
     this._tx = decodeTransaction(decoder)
     // console.log(this.calcHash())
   }
 
-  calcHash() {
-    const tx = {...this._tx, isSegwit: false}
-    return hash256(encodeTransaction(tx)).toString('hex')
+  get id() {
+    return this._id.toString('hex')
   }
 
   static encode(tx) {
@@ -44,7 +46,26 @@ class Transaction {
   }
 
   inspect() {
-    return this._tx
+    return {
+      txId: this._id.toString('hex'),
+      isSegwit: this._tx.isSegWit,
+      version: this._tx.version,
+      txIns: this._tx.txIns.map(txIn => ({
+        hash: txIn.hash.reverse().toString('hex'),
+        index: txIn.index,
+        script: txIn.script,
+        sequence: txIn.sequence.toString(16).padStart(0, 8, '0'),
+        witnesses: txIn.witnesses
+      })),
+      txOuts: this._tx.txOuts.map(txOut => {
+        const guessed = guessScript(txOut.script)
+        if (guessed) {
+          return {...txOut, ...guessed}
+        }
+        return txOut
+      }),
+      locktime: this._tx.locktime
+    }
   }
 
   verify() {}

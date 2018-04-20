@@ -11,8 +11,7 @@ const {TxDB} = require('./chap-transaction/txdb')
 const {guessScript} = require('./chap-script/unlock')
 
 const {execRegtest} = require('./chap-bitcoin/exec-regtest')
-const conf = require('./conf.json')
-const {decodeTransaction} = require('./chap-transaction/decode-transaction')
+const {conf} = require('./')
 const {encodeTransaction} = require('./chap-transaction/encode-transaction')
 const {Keypair} = require('./chap-bitcoin-crypto/keypair')
 
@@ -28,26 +27,28 @@ const {BTC} = require('./chap-transaction/btc')
 const keys = []
 
 const cl = new Client({
-  network: 'testnet',
+  network: conf.network,
   username: conf.user,
   password: conf.pass,
   port: conf.rpcport,
 })
 
 const createAccount = async name => {
-  const kp = Keypair.generate({network: 'testnet'})
-  console.log(kp.toAddress())
-  // keys.push(kp)
-  // await cl.importPrivKey(kp.toWIF())
-  // console.log(name, kp.toAddress())
-  // await cl.setAccount(kp.toAddress(), name)
+  const addr = await cl.getNewAddress()
+  const wif = await cl.dumpPrivKey(addr)
+  const kp = Keypair.fromWIF(wif)
+  keys.push(kp)
+  console.log(name, addr, kp.toAddress())
+  await cl.setAccount(kp.toAddress(), name)
   return kp
 }
 
 const txDB = new TxDB({
   txFetcher: async txId => {
     const txHex = await cl.getRawTransaction(txId)
-    return Transaction.fromHex(txHex)
+    const tx = Transaction.fromHex(txHex)
+    // console.log(tx.id, txId)
+    return tx
   },
   blockFetcher: async blockId => {
     const blockHex = await cl.getBlock(blockId, 0)
@@ -85,7 +86,7 @@ const sendToP2PKH = (utxo, address, value) => {
 }
 
 const putBalance = async name => {
-  console.log(name, await cl.getBalance(name))
+  console.log(name, 'has', await cl.getBalance(name))
 } 
 
 const generate = async n => {
@@ -94,8 +95,6 @@ const generate = async n => {
   for (let blockId of blockIds) {
     const b = await txDB.fetchBlock(blockId)
     const block = await cl.getBlock(blockId)
-
-
 
     for (let txId of block.tx) {
       await txDB.fetchTransaction(txId)
@@ -117,11 +116,12 @@ const testBitcoinCore = async () => {
   // const bob = await createAccount('bob')
 
   const utxos = txDB.searchTransaction(keys)
+  console.log(utxos)
 
   await generate(100)
 
-  const sendTx = sendToP2PKH(utxos[0], alice.toAddress(), 10)
-  console.log(1, Transaction.fromBuffer(sendTx))
+  const sendTx = sendToP2PKH(utxos[0], alice.toAddress(), 40)
+  // console.log(1, Transaction.fromBuffer(sendTx))
 
   // const a = bc.ECPair.fromWIF(utxos[0].key.toWIF(), bc.networks.testnet)
   
@@ -140,9 +140,9 @@ const testBitcoinCore = async () => {
 
   const txId = await cl.sendToAddress(alice.toAddress(), 40)
   await cl.generate(1)
-  console.log(txId)
   const tx = await txDB.fetchTransaction(txId)
-  console.log(tx)
+  console.log(tx.txOuts[0].script, tx.txOuts[0].script.toHex())
+  console.log(tx.txOuts[1].script, tx.txOuts[1].script.toHex())
 
   putBalance('alice')
 

@@ -8,8 +8,10 @@ class TxDB {
   constructor(opts) {
     this._tx = {}
     this._block = {}
-    this._txFetcher = opts.txFetcher || Promise.reject('Tx fetcher is not registered.')
-    this._blockFetcher = opts.blockFetcher || Promise.reject('Block fetcher is not registered.')
+    this._txFetcher =
+      opts.txFetcher || Promise.reject('Tx fetcher is not registered.')
+    this._blockFetcher =
+      opts.blockFetcher || Promise.reject('Block fetcher is not registered.')
   }
 
   async fetchTransaction(txId) {
@@ -34,14 +36,19 @@ class TxDB {
       const tx = this._tx[txId]
       tx.txOuts.forEach((txOut, index) => {
         const res = guessScript(txOut.script)
+        console.log(res)
         if (!res) {
           return
         }
-        switch (res.name) {
+        switch (res.type) {
           case 'P2PK': {
-            const key = keys.find(v => v.toPublicKey().toString('hex') === res.pubkey)
+            const key = keys.find(v => {
+              return (
+                v.toPublicKey().toString('hex') === res.pubkey.toString('hex')
+              )
+            })
             if (!key) {
-              console.log('pubkey', txId, index, res.pubkey)
+              console.log('pubkey', txId, index, res.pubkey.toString('hex'))
               return
             }
 
@@ -50,7 +57,7 @@ class TxDB {
               hash: Buffer.from(txId, 'hex'),
               index,
               script: txOut.script,
-              type: res.name
+              type: res.name,
             })
             return
           }
@@ -62,7 +69,6 @@ class TxDB {
     })
     return utxos
   }
-
 
   // static myTxos(mykey, tx) {
   //   assert(mykey instanceof Keypair)

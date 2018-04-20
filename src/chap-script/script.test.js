@@ -7,7 +7,7 @@ describe('Script', () => {
     expect(script.toASM()).toEqual('OP_HASH160 4cb06b9a9d506d71109a0da84647bc106df7a121 OP_EQUAL')
     expect(script.getChunks()).toEqual([
       'OP_HASH160',
-      '4cb06b9a9d506d71109a0da84647bc106df7a121',
+      Buffer.from('4cb06b9a9d506d71109a0da84647bc106df7a121', 'hex'),
       'OP_EQUAL'
     ])
     expect(script.toBuffer()).toEqual(Buffer.from(hex, 'hex'))

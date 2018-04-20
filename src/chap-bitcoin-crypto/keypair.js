@@ -5,7 +5,7 @@ const secp256k1 = require('secp256k1')
 
 const {decodeBase58Check, encodeBase58Check} = require('./base58check')
 const {hash160} = require('./hash')
-const conf = require('../conf.json')
+const {conf, networks} = require('../')
 
 class Keypair {
   /**
@@ -59,10 +59,10 @@ class Keypair {
     }
 
     if (opt.network && this.network !== opt.network) {
-      throw new Error(`Wrong network ${keu[0].toString(0)}: ${network}`)
+      throw new Error(`Wrong network ${key[0].toString(0)}: ${network}`)
     }
 
-    this.pubkeyHash = Buffer.from([conf.networks[this.network].pubKeyHash])
+    this.pubkeyHash = networks[this.network].pubkeyHash
 
     assert(this.privateKey === null || this.privateKey.length === 32)
   }
@@ -83,38 +83,24 @@ class Keypair {
    */
   static fromPublicKey(pubkey, opt = {}) {
     assert(pubkey instanceof Buffer)
-    switch (opt.network) {
-      case 'mainnet': {
-        return new Keypair(Buffer.concat([Buffer.from([0x00]), pubkey]), opt)
-      }
-      case 'testnet': {
-        return new Keypair(Buffer.concat([Buffer.from([0x6f]), pubkey]), opt)
-      }
-      default: {
-        throw new Error(`unknown network: ${opt.network}`)
-      }
+    if (opt.network) {
+      return new Keypair(Buffer.concat([networks[opt.network].pubkeyHash, pubkey]), opt)
     }
+    return new Keypair(Buffer.concat([conf.pubkeyHash, pubkey]), opt)
   }
 
   /**
    * generate random key.
-   * @param {string} opt.network 'mainnet' or 'testnet'
+   * @param {*} opt
    */
-  static generate(opt) {
+  static generate(opt = {}) {
     for (;;) {
       const privateKey = randomBytes(32) // 32バイト 256ビットの乱数
       if (secp256k1.privateKeyVerify(privateKey)) {
-        switch (opt.network) {
-          case 'mainnet': {
-            return new Keypair(Buffer.concat([Buffer.from([0x80]), privateKey]), opt)
-          }
-          case 'testnet': {
-            return new Keypair(Buffer.concat([Buffer.from([0xef]), privateKey]), opt)
-          }
-          default: {
-            throw new Error(`unknown network: ${opt.network}`)
-          }
+        if (opt.network) {
+          return new Keypair(Buffer.concat([networks[opt.network].wif, privateKey]), opt)
         }
+        return new Keypair(Buffer.concat([conf.wif, privateKey]), opt)
       }
     }
   }
@@ -151,6 +137,10 @@ class Keypair {
    * @returns {string} private key WIF
    */
   toWIF() {
+    if (!this.privateKey) {
+      return null
+    }
+
     const ar = [this.wif, this.privateKey]
     if (this.isCompressd) {
       ar.push(Buffer.from([this.isCompressd]))
@@ -162,6 +152,15 @@ class Keypair {
     const sig = secp256k1.sign(buf, this.privateKey).signature
     console.log(sig.toString('hex'))
     return sig
+  }
+
+  inspect() {
+    return {
+      address: this.toAddress(),
+      privateKey: this.toWIF(),
+      publickKey: this.publicKey.toString('hex'),
+      pubkeyHash: this.toPubkeyHash().toString('hex')
+    }
   }
 }
 

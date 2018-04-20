@@ -4,7 +4,7 @@ class BTC {
   }
 
   static fromBTC(btc) {
-    return new BTC(btc * 1000000000)
+    return new BTC(btc * 10 ** 8)
   }
 
   static fromSatoshi(satoshi) {
@@ -19,9 +19,17 @@ class BTC {
     return BTC.fromBuffer(Buffer.from(hex, 'hex'))
   }
 
+  toBTC() {
+    return this.satoshi / 10 ** 8
+  }
+
+  toSatoshi() {
+    return this.satoshi
+  }
+
   toBuffer() {
     const buf = Buffer.alloc(8)
-    buf.writeUInt32LE(this.satoshi % 2 ** 32 - 1, 0)
+    buf.writeUInt32LE(this.satoshi % 2 ** 32, 0)
     buf.writeUInt32LE(this.satoshi / 2 ** 32 | 0, 4)
     return buf
   }
@@ -31,7 +39,7 @@ class BTC {
   }
 
   inspect() {
-    return this.satoshi
+    return `${this.satoshi / 10 ** 8} BTC (${this.satoshi} Satoshi)`
   }
 }
 

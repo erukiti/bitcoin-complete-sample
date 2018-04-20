@@ -4,9 +4,9 @@ const os = require('os')
 const childPorcess = require('child_process')
 const net = require('net')
 
-const defaultConf = require('../conf.json')
+const {conf} = require('../')
 
-const execRegtest = (opt = defaultConf) => {
+const execRegtest = (opt = conf) => {
   return new Promise((resolve, reject) => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'regtest-'))
 

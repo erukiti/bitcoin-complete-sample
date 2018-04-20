@@ -1,6 +1,9 @@
 const assert = require('assert')
 
 const {Script} = require('./script')
+const {Keypair} = require('../chap-bitcoin-crypto/keypair')
+const {encodeBase58Check} = require('../chap-bitcoin-crypto/base58check')
+const {conf} = require('../')
 
 const unlockers = [
   scriptChunks => {
@@ -8,39 +11,47 @@ const unlockers = [
       scriptChunks.length !== 5 ||
       scriptChunks[0] !== 'OP_DUP' ||
       scriptChunks[1] !== 'OP_HASH160' ||
-      scriptChunks[2].length !== 40 ||
+      !(scriptChunks[2] instanceof Buffer) ||
       scriptChunks[3] !== 'OP_EQUALVERIFY' ||
       scriptChunks[4] !== 'OP_CHECKSIG'
     ) {
       return null
     }
 
+    const pubkeyHash = scriptChunks[2]
     return {
-      name: 'P2PKH',
-      pubkeyHash: scriptChunks[2],
+      type: 'P2PKH',
+      pubkeyHash,
+      address: encodeBase58Check(pubkeyHash),
     }
   },
   scriptChunks => {
     if (
       scriptChunks.length !== 3 ||
       scriptChunks[0] !== 'OP_HASH160' ||
-      scriptChunks[1].length !== 40 ||
+      !(scriptChunks[1] instanceof Buffer) ||
       scriptChunks[2] !== 'OP_EQUAL'
     ) {
       return null
     }
     return {
-      name: 'P2SH',
+      type: 'P2SH',
       scriptHash: scriptChunks[1],
     }
   },
   scriptChunks => {
-    if (scriptChunks.length !== 2 && scriptChunks[1] !== 'OP_CHECKSIG') {
+    if (
+      scriptChunks.length !== 2 ||
+      !(scriptChunks[0] instanceof Buffer) ||
+      scriptChunks[1] !== 'OP_CHECKSIG'
+    ) {
       return null
     }
+    const pubkey = scriptChunks[0]
     return {
-      name: 'P2PK',
-      pubkey: scriptChunks[0],
+      type: 'P2PK',
+      pubkey,
+      address: Keypair.fromPublicKey(pubkey).toAddress(),
     }
   },
 ]

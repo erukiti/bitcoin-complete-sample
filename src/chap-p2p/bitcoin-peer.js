@@ -2,7 +2,7 @@ const assert = require('assert')
 const {EventEmitter} = require('events')
 const net = require('net')
 
-const defaultConf = require('../conf.json')
+const {conf} = require('../')
 
 const {PacketEncoder} = require('../chap-encode/packet-encoder')
 const {PacketDecoder} = require('../chap-encode/packet-decoder')
@@ -48,7 +48,7 @@ class BitcoinPeer {
 
     this._magic = 0xdab5bffa
     this._host = '127.0.0.1'
-    this._port = defaultConf.port
+    this._port = conf.port
 
     this._conenct = new Promise((resolve, reject) => {
       this._socket = net.connect(this._port, this._host)

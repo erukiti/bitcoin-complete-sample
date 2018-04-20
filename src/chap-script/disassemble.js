@@ -3,10 +3,13 @@ const assert = require('assert')
 const {splitBytecode} = require('./split-bytecode')
 
 const table = [
+  {opCode: 0x51, mnemonic: ['OP_1', 'OP_TRUE']},
+  {opCode: 0x6a, mnemonic: ['OP_RETURN']},
   {opCode: 0x76, mnemonic: ['OP_DUP']},
   {opCode: 0xa9, mnemonic: ['HASH160']},
   {opCode: 0xac, mnemonic: ['CHECKSIG']},
-  {opCode: 0x87, mnemonic: ['EQUAL']}
+  {opCode: 0x87, mnemonic: ['EQUAL']},
+  {opCode: 0x88, mnemonic: ['EQUALVERIFY']},
 ]
 
 const lookup = Array(256).fill('UNKNOWN_OPCODE')
@@ -35,10 +38,10 @@ const disassebleBytecode = buf => {
       result.push(disassebleOpCode(chunk))
     } else {
       assert(chunk instanceof Buffer)
-      result.push(chunk.toString('hex'))
+      result.push(chunk)
     }
   })
-  return result.join(' ')
+  return result
 }
 
 module.exports = {

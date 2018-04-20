@@ -11,7 +11,7 @@ class Script {
   constructor(buf) {
     assert(buf instanceof Buffer, `${buf} is not Buffer.`)
     this._scriptBuf = buf
-    this._asm = disassebleBytecode(buf)
+    this._chunks = disassebleBytecode(buf)
   }
 
   /**
@@ -39,15 +39,21 @@ class Script {
   }
 
   inspect() {
-    return `ASM: ${this._asm}`
+    return `ASM: ${this.toASM()}`
   }
 
   toASM() {
-    return this._asm
+    return this._chunks.map(chunk => {
+      if (chunk instanceof Buffer) {
+        return chunk.toString('hex')
+      } else {
+        return chunk
+      }
+    }).join(' ')
   }
 
   getChunks() {
-    return this._asm.split(' ')
+    return this._chunks
   }
 }
 
