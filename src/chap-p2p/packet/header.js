@@ -8,9 +8,9 @@ const decodeCommand = (decoder) => {
 }
 
 const decodeHeader = decoder => {
-  const magic = decoder.uInt32()
+  const magic = decoder.uInt32LE()
   const command = decodeCommand(decoder)
-  const payloadLength = decoder.uInt32()
+  const payloadLength = decoder.uInt32LE()
   const checksum = decoder.data(4)
   return {
     magic,
@@ -21,11 +21,11 @@ const decodeHeader = decoder => {
 }
 
 const encodeHeader = (encoder, {magic, command, payload}) => {
-  encoder.uInt32(magic)
+  encoder.uInt32LE(magic)
   const buf = Buffer.alloc(12).fill(0)
   buf.write(command)
   encoder.data(buf)
-  encoder.uInt32(payload.length)
+  encoder.uInt32LE(payload.length)
   encoder.data(getChechsum(payload))
 }
 

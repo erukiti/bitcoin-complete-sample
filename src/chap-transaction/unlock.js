@@ -12,6 +12,7 @@ const unlockers = [
       scriptChunks[0] !== 'OP_DUP' ||
       scriptChunks[1] !== 'OP_HASH160' ||
       !(scriptChunks[2] instanceof Buffer) ||
+      scriptChunks[2].length !== 20 ||
       scriptChunks[3] !== 'OP_EQUALVERIFY' ||
       scriptChunks[4] !== 'OP_CHECKSIG'
     ) {
@@ -22,7 +23,7 @@ const unlockers = [
     return {
       type: 'P2PKH',
       pubkeyHash,
-      address: encodeBase58Check(pubkeyHash),
+      address: encodeBase58Check(Buffer.concat([conf.pubkeyHash, pubkeyHash])),
     }
   },
   scriptChunks => {
@@ -30,6 +31,7 @@ const unlockers = [
       scriptChunks.length !== 3 ||
       scriptChunks[0] !== 'OP_HASH160' ||
       !(scriptChunks[1] instanceof Buffer) ||
+      scriptChunks[1].length !== 20 ||
       scriptChunks[2] !== 'OP_EQUAL'
     ) {
       return null

@@ -34,12 +34,16 @@ const cl = new Client({
 })
 
 const createAccount = async name => {
+  // const addr = await cl.getNewAddress(name)
+  // const wif = await cl.dumpPrivKey(addr)
+  // const kp = Keypair.fromWIF(wif)
   const kp = Keypair.generate()
-  keys.push(kp)
   await cl.importPrivKey(kp.toWIF())
+
+  keys.push(kp)
   console.log(name)
   console.log(kp)
-  await cl.setAccount(kp.toAddress(), name)
+  // await cl.setAccount(kp.toAddress(), name)
   return kp
 }
 
@@ -84,11 +88,11 @@ const sendToP2PKH = (utxo, address, value) => {
     {
       hash: utxo.hash,
       index: utxo.index,
-      sequence: 0xfffffffe,
+      sequence: 0xffffffff,
       script: utxo.script,
     },
   ]
-  const sendHash = Keypair.fromWIF(address).toPubkeyHash()
+  const sendHash = decodeBase58Check(address).slice(1)
   console.log(sendHash.length)
   const txOuts = [
     {
@@ -111,9 +115,9 @@ const sendToP2PKH = (utxo, address, value) => {
 
 
 const testBitcoinCore = async () => {
-  await execRegtest()
+  // await execRegtest()
 
-  await generate(1)
+  // await generate(1)
 
   const alice = await createAccount('alice')
   // const bob = await createAccount('bob')
@@ -121,7 +125,7 @@ const testBitcoinCore = async () => {
   const utxos = txDB.searchTransaction(keys)
   console.log(utxos)
 
-  await generate(100)
+  // await generate(100)
 
   putBalance('alice')
 

@@ -1,4 +1,4 @@
-const {decodeTransaction} = require('../chap-transaction/decode-transaction')
+const {Transaction} = require('../chap-transaction/transaction')
 const {hash256} = require('../chap-bitcoin-crypto/hash')
 
 const decodeBlock = decoder => {
@@ -14,7 +14,7 @@ const decodeBlock = decoder => {
     const nTx = decoder.varInt()
 
     for (let i = 0; i < nTx; i++) {
-      tx.push(decodeTransaction(decoder))
+      tx.push(new Transaction(decoder))
     }
   }
 

@@ -1,11 +1,17 @@
 #! /usr/bin/env node
 
-const {BitcoinPeer} = require('../chap-p2p/bitcoin-peer')
-const {encodeVersion} = require('../chap-p2p/packet/version')
+const {BitcoinPeer} = require('../src/chap-p2p/bitcoin-peer')
+const {encodeVersion} = require('../src/chap-p2p/packet/version')
+const {conf} = require('../src/index')
 
 const peer = new BitcoinPeer()
+
+const blocks = {}
+const txs = {}
+
 peer.onCommand('version', payload => {
   console.log(payload)
+  // payload.startHeight
 })
 
 peer.onCommand('sendcmpct', payload => {
@@ -37,16 +43,38 @@ peer.onCommand('ping', payload => {
   peer.send('pong', payload)
 })
 
+const onTx = tx => {
+  if (tx.id in txs) {
+    console.warn(`warn: Tx ${tx.id} is already exists.`)
+  } else {
+    txs[tx.id] = tx
+    console.log('  Tx', tx)
+  }
+}
+
+const onBlock = block => {
+  if (block.id in blocks) {
+    console.warn(`warn: Block ${block.id} is already exists.`)
+  } else {
+    blocks[block.id] = block
+    block.getTransactions().forEach(tx => onTx(tx))
+    console.log('  Block', block)
+  }
+}
+
 peer.onCommand('block', payload => {
-  console.log('  block', JSON.stringify(payload, null, '  '))
+  onBlock(payload)
 })
 
 const body = async () => {
   await peer.connect()
   peer.send('version', {})
-
   peer.send('verack')
-  
+
+  peer.send('getblocks', {
+    ids: [conf.genesisBlock],
+    stopHash: Buffer.alloc(32).fill(0)
+  })
 }
 
 body()

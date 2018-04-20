@@ -14,7 +14,12 @@ const {decodePing, encodePing} = require('./packet/ping')
 const {decodeAddr} = require('./packet/addr')
 const {decodeFeefilter} = require('./packet/feefilter')
 const {decodeInv, encodeInv} = require('./packet/inv')
-const {decodeBlock} = require('../chap-block/decode-block')
+const {decodeBlock} = require('./packet/block')
+const {encodeGetheaders} = require('./packet/getheaders')
+const {decodeHeaders} = require('./packet/headers')
+const {encodeGetblocks} = require('./packet/getblocks')
+
+const {TxDB} = require('./txdb')
 
 const nop = () => ({})
 const payloadDecoders = {
@@ -29,6 +34,7 @@ const payloadDecoders = {
   inv: decodeInv,
   getdata: decodeInv,
   block: decodeBlock,
+  headers: decodeHeaders,
 }
 
 const payloadEncoders = {
@@ -38,6 +44,8 @@ const payloadEncoders = {
   pong: encodePing,
   inv: encodeInv,
   getdata: encodeInv,
+  getheaders: encodeGetheaders,
+  getblocks: encodeGetblocks,
 }
 
 const HEADER_LENGTH = 4 + 12 + 4 + 4
@@ -45,6 +53,8 @@ const HEADER_LENGTH = 4 + 12 + 4 + 4
 class BitcoinPeer {
   constructor() {
     this._ev = new EventEmitter()
+
+    console.log(conf)
 
     this._magic = 0xdab5bffa
     this._host = '127.0.0.1'
@@ -121,11 +131,11 @@ class BitcoinPeer {
    * @param {Bugger} payload コマンドに付随するペイロード
    */
   send(command, payload = {}) {
-    assert(command in payloadEncoders)
+    assert(command in payloadEncoders, `unknown Encoder: ${command}`)
 
     console.log('#send:', command)
 
-    const encodePayload = (command, payload) => {
+    const _encodePayload = (command, payload) => {
       const encoder = new PacketEncoder()
       payloadEncoders[command](encoder, payload)
       return encoder.build()
@@ -136,7 +146,7 @@ class BitcoinPeer {
       return encoder.build()
     }
 
-    const payloadBuf = encodePayload(command, payload)
+    const payloadBuf = _encodePayload(command, payload)
     const header = _encodeHeader(command, payloadBuf)
     // console.log(header.toString('hex'))
     // console.log(payloadBuf.toString('hex'))

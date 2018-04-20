@@ -1,5 +1,5 @@
 const decodeFeefilter = decoder => {
-  const fee = decoder.uInt64()
+  const fee = decoder.uInt64LE()
   return {
     fee
   }

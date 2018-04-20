@@ -26,7 +26,19 @@ class Block {
     return new Block(PacketDecoder.fromHex(hex))
   }
 
+  /**
+   * @returns {string} BlockID
+   */
+  get id() {
+    return this._block.id.toString('hex')
+  }
 
+  /**
+   * @returns {Transaction[]}
+   */
+  getTransactions() {
+    return this._block.tx
+  }
   inspect() {
     return {
       id: this._block.id.toString('hex'),
@@ -36,7 +48,7 @@ class Block {
       timestamp: this._block.timestamp,
       bits: this._block.bits.toString(16),
       nonce: this._block.nonce.toString('hex'),
-      tx: this._block.tx
+      tx: this._block.tx.map(tx => tx.id)
     }
   }
 }

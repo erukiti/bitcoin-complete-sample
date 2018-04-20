@@ -9,7 +9,7 @@ describe('', () => {
     expect(guessScript(script)).toEqual({
       type: 'P2PKH',
       pubkeyHash,
-      address: 'KN5k7EDEQAd84qsUAx8sLeDG6RjxLqPVE'
+      address: 'myt33AKC3RbsuBKVBjvWhFrY862SrAUbhe'
     })
   })
 
