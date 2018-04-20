@@ -1,19 +1,10 @@
 const assert = require('assert')
 
 const {splitBytecode} = require('./split-bytecode')
-
-const table = [
-  {opCode: 0x51, mnemonic: ['OP_1', 'OP_TRUE']},
-  {opCode: 0x6a, mnemonic: ['OP_RETURN']},
-  {opCode: 0x76, mnemonic: ['OP_DUP']},
-  {opCode: 0xa9, mnemonic: ['HASH160']},
-  {opCode: 0xac, mnemonic: ['CHECKSIG']},
-  {opCode: 0x87, mnemonic: ['EQUAL']},
-  {opCode: 0x88, mnemonic: ['EQUALVERIFY']},
-]
+const {opTable} = require('./op-table')
 
 const lookup = Array(256).fill('UNKNOWN_OPCODE')
-table.forEach(entry => {
+opTable.forEach(entry => {
   assert(lookup[entry.opCode] === 'UNKNOWN_OPCODE')
   assert(Array.isArray(entry.mnemonic))
   if (entry.mnemonic.length > 0) {

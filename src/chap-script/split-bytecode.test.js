@@ -14,4 +14,10 @@ it('', () => {
     0x88,
     0xac
   ])
+
+  expect(splitBytecode(Buffer.from('6a76a9148faea84b90c599757497b69c14bf82a882a4193788ac', 'hex'))).toEqual([
+    0x6a,
+    Buffer.from('76a9148faea84b90c599757497b69c14bf82a882a4193788ac', 'hex'),
+  ])
+
 })

@@ -14,6 +14,12 @@ const splitBytecode = buf => {
     offset++
     if (opCode === 0x00 || opCode >= 0x4f) {
       result.push(opCode)
+      if (opCode === 0x6a) {
+        // OP_RETURN
+
+        result.push(buf.slice(offset))
+        offset = buf.length
+      }
       continue
     }
     switch (opCode) {

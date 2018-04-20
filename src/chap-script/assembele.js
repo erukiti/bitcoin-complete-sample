@@ -1,12 +1,11 @@
 const assert = require('assert')
 
-const table = {
-  OP_DUP: 0x76,
-  OP_HASH160: 0xa9,
-  OP_CHECKSIG: 0xac,
-  OP_EQUAL: 0x87,
-  OP_EQUALVERIFY: 0x88,
-}
+const {opTable} = require('./op-table')
+
+const table = {}
+opTable.forEach(({opCode, mnemonic}) => {
+  mnemonic.forEach(s => table[`OP_${s}`] = opCode)
+})
 
 /**
  *
