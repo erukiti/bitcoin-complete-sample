@@ -6,8 +6,8 @@ const secp256k1 = require('secp256k1')
 const bitcoin = require('bitcoinjs-lib')
 
 const {Script} = require('./chap-script/script')
-const {Transaction} = require('./chap-transaction')
-const {TxDB} = require('./chap-transaction/txdb')
+const {Transaction} = require('./chap-transaction/transaction')
+const {TxDB} = require('./chap-p2p/txdb')
 const {guessScript} = require('./chap-transaction/unlock')
 
 const {execRegtest} = require('./chap-bitcoin/exec-regtest')
