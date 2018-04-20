@@ -1,6 +1,6 @@
 const assert = require('assert')
 
-const {Script} = require('./script')
+const {Script} = require('../chap-script/script')
 const {Keypair} = require('../chap-bitcoin-crypto/keypair')
 const {encodeBase58Check} = require('../chap-bitcoin-crypto/base58check')
 const {conf} = require('../')

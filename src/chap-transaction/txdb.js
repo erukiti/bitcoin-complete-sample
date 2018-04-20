@@ -2,7 +2,7 @@ const assert = require('assert')
 
 const {Transaction} = require('./index')
 const {Keypair} = require('../chap-bitcoin-crypto/keypair')
-const {guessScript} = require('../chap-script/unlock')
+const {guessScript} = require('./unlock')
 
 class TxDB {
   constructor(opts) {

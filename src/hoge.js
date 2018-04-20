@@ -8,7 +8,7 @@ const bitcoin = require('bitcoinjs-lib')
 const {Script} = require('./chap-script/script')
 const {Transaction} = require('./chap-transaction')
 const {TxDB} = require('./chap-transaction/txdb')
-const {guessScript} = require('./chap-script/unlock')
+const {guessScript} = require('./chap-transaction/unlock')
 
 const {execRegtest} = require('./chap-bitcoin/exec-regtest')
 const {conf} = require('./')

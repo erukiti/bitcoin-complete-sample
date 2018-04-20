@@ -6,7 +6,7 @@ const {hash256} = require('../chap-bitcoin-crypto/hash')
 const {decodeTransaction} = require('./decode-transaction')
 const {encodeTransaction} = require('./encode-transaction')
 const {PacketDecoder} = require('../chap-encode/packet-decoder')
-const {guessScript} = require('../chap-script/unlock')
+const {guessScript} = require('./unlock')
 const {Keypair} = require('../chap-bitcoin-crypto/keypair')
 
 class Transaction {

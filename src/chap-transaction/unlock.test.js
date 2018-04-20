@@ -1,6 +1,6 @@
 const {Keypair} = require('../chap-bitcoin-crypto/keypair')
 const {guessScript} = require('./unlock')
-const {Script} = require('./script')
+const {Script} = require('../chap-script/script')
 
 describe('', () => {
   it('P2PKH', () => {
