@@ -36,7 +36,6 @@ class TxDB {
       const tx = this._tx[txId]
       tx.txOuts.forEach((txOut, index) => {
         const res = guessScript(txOut.script)
-        console.log(res)
         if (!res) {
           return
         }
@@ -54,10 +53,10 @@ class TxDB {
 
             utxos.push({
               key,
-              hash: Buffer.from(txId, 'hex'),
+              hash: Buffer.from(txId, 'hex').reverse(),
               index,
               script: txOut.script,
-              type: res.name,
+              type: res.type,
             })
             return
           }

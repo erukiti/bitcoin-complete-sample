@@ -3,7 +3,7 @@ const assert = require('assert')
 const Client = require('bitcoin-core')
 const secp256k1 = require('secp256k1')
 
-const bc = require('bitcoinjs-lib')
+const bitcoin = require('bitcoinjs-lib')
 
 const {Script} = require('./chap-script/script')
 const {Transaction} = require('./chap-transaction')
@@ -34,11 +34,11 @@ const cl = new Client({
 })
 
 const createAccount = async name => {
-  const addr = await cl.getNewAddress()
-  const wif = await cl.dumpPrivKey(addr)
-  const kp = Keypair.fromWIF(wif)
+  const kp = Keypair.generate()
   keys.push(kp)
-  console.log(name, addr, kp.toAddress())
+  await cl.importPrivKey(kp.toWIF())
+  console.log(name)
+  console.log(kp)
   await cl.setAccount(kp.toAddress(), name)
   return kp
 }
@@ -55,35 +55,6 @@ const txDB = new TxDB({
     return Block.fromHex(blockHex)
   }
 })
-
-const sendToP2PKH = (utxo, address, value) => {
-  const txIns = [
-    {
-      hash: utxo.hash,
-      index: utxo.index,
-      sequence: 0xfffffffe,
-      script: utxo.script,
-    },
-  ]
-  const sendHash = Keypair.fromWIF(address).toPubkeyHash()
-  const txOuts = [
-    {
-      value: BTC.fromBTC(49.99999),
-      script: Script.asm`OP_DUP OP_HASH160 ${sendHash} OP_EQUALVERIFY OP_CHECKSIG`,
-    }
-  ]
-
-  const tmpTx = Transaction.encode({txIns, txOuts, version: 2})
-  // console.log(tmpTx)
-
-  const sigHash = hash256(tmpTx.toBuffer())
-  const sign = Buffer.concat([
-    secp256k1.signatureExport(secp256k1.sign(sigHash, utxo.key.privateKey).signature),
-    Buffer.from([0x01, 0, 0, 0])
-  ])
-  txIns[0].script = Script.asm`${sign}`
-  return encodeTransaction({txIns, txOuts, version: 2})
-}
 
 const putBalance = async name => {
   console.log(name, 'has', await cl.getBalance(name))
@@ -107,6 +78,38 @@ const generate = async n => {
   }
 }
 
+const sendToP2PKH = (utxo, address, value) => {
+  console.log(utxo.hash, utxo.script)
+  const txIns = [
+    {
+      hash: utxo.hash,
+      index: utxo.index,
+      sequence: 0xfffffffe,
+      script: utxo.script,
+    },
+  ]
+  const sendHash = Keypair.fromWIF(address).toPubkeyHash()
+  console.log(sendHash.length)
+  const txOuts = [
+    {
+      value: BTC.fromBTC(49.99999),
+      script: Script.asm`OP_DUP OP_HASH160 ${sendHash} OP_EQUALVERIFY OP_CHECKSIG`,
+    }
+  ]
+
+  const tmpTx = Transaction.encode({txIns, txOuts, version: 2})
+  // console.log(tmpTx)
+
+  const sigHash = hash256(Buffer.concat([tmpTx.toBuffer(), Buffer.from([1,0,0,0])]))
+  const sign = Buffer.concat([
+    secp256k1.signatureExport(secp256k1.sign(sigHash, utxo.key.privateKey).signature),
+    Buffer.from([0x01])
+  ])
+  txIns[0].script = Script.asm`${sign}`
+  return Transaction.encode({txIns, txOuts, version: 2})
+}
+
+
 const testBitcoinCore = async () => {
   await execRegtest()
 
@@ -120,8 +123,11 @@ const testBitcoinCore = async () => {
 
   await generate(100)
 
+  putBalance('alice')
+
   const sendTx = sendToP2PKH(utxos[0], alice.toAddress(), 40)
-  // console.log(1, Transaction.fromBuffer(sendTx))
+  console.log(1, sendTx)
+  console.log(await cl.sendRawTransaction(sendTx.toHex()))
 
   // const a = bc.ECPair.fromWIF(utxos[0].key.toWIF(), bc.networks.testnet)
   
@@ -134,16 +140,13 @@ const testBitcoinCore = async () => {
 
 
 
-  // console.log(await cl.sendRawTransaction(sendTx.toString('hex')))
 
-  putBalance('alice')
 
-  const txId = await cl.sendToAddress(alice.toAddress(), 40)
-  await cl.generate(1)
-  const tx = await txDB.fetchTransaction(txId)
-  console.log(tx.txOuts[0].script, tx.txOuts[0].script.toHex())
-  console.log(tx.txOuts[1].script, tx.txOuts[1].script.toHex())
-
+  // const txId = await cl.sendToAddress(alice.toAddress(), 40)
+  const blockIds = await cl.generate(1)
+  console.log(blockIds)
+  // const tx = await txDB.fetchTransaction(txId)
+  // console.log(tx)
   putBalance('alice')
 
 

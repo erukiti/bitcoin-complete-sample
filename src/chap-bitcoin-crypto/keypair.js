@@ -123,14 +123,14 @@ class Keypair {
    * @returns {Buffer}
    */
   toPubkeyHash() {
-    return Buffer.concat([this.pubkeyHash, hash160(this.publicKey)])
+    return hash160(this.publicKey)
   }
 
   /**
    * @returns {string} public Bitcoin address
    */
   toAddress() {
-    return encodeBase58Check(this.toPubkeyHash())
+    return encodeBase58Check(Buffer.concat([this.pubkeyHash, hash160(this.publicKey)]))
   }
 
   /**
@@ -150,7 +150,7 @@ class Keypair {
 
   sign(buf) {
     const sig = secp256k1.sign(buf, this.privateKey).signature
-    console.log(sig.toString('hex'))
+    console.log('sign', sig.toString('hex'))
     return sig
   }
 
