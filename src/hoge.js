@@ -8,10 +8,9 @@ const bitcoin = require('bitcoinjs-lib')
 const {Script} = require('./chap-script/script')
 const {Transaction} = require('./chap-transaction/transaction')
 const {TxDB} = require('./chap-p2p/txdb')
-const {guessScript} = require('./chap-transaction/unlock')
 
 const {execRegtest} = require('./chap-bitcoin/exec-regtest')
-const {conf} = require('./')
+const {conf, logger} = require('./')
 const {encodeTransaction} = require('./chap-transaction/encode-transaction')
 const {Keypair} = require('./chap-bitcoin-crypto/keypair')
 
@@ -41,9 +40,7 @@ const createAccount = async name => {
   await cl.importPrivKey(kp.toWIF())
 
   keys.push(kp)
-  console.log(name)
-  console.log(kp)
-  // await cl.setAccount(kp.toAddress(), name)
+  logger.debug(name, kp.toAddress())
   return kp
 }
 
@@ -83,6 +80,7 @@ const generate = async n => {
 }
 
 const sendToP2PKH = (utxo, address, value) => {
+  console.log(utxo)
   console.log(utxo.hash, utxo.script)
   const txIns = [
     {
@@ -93,39 +91,35 @@ const sendToP2PKH = (utxo, address, value) => {
     },
   ]
   const sendHash = decodeBase58Check(address).slice(1)
-  console.log(sendHash.length)
   const txOuts = [
     {
       value: BTC.fromBTC(49.99999),
       script: Script.asm`OP_DUP OP_HASH160 ${sendHash} OP_EQUALVERIFY OP_CHECKSIG`,
     }
   ]
-
   const tmpTx = Transaction.encode({txIns, txOuts, version: 2})
-  // console.log(tmpTx)
-
   const sigHash = hash256(Buffer.concat([tmpTx.toBuffer(), Buffer.from([1,0,0,0])]))
-  const sign = Buffer.concat([
+  const sig = Buffer.concat([
     secp256k1.signatureExport(secp256k1.sign(sigHash, utxo.key.privateKey).signature),
     Buffer.from([0x01])
   ])
-  txIns[0].script = Script.asm`${sign}`
+  txIns[0].script = utxo.createScript({sig})
   return Transaction.encode({txIns, txOuts, version: 2})
 }
 
 
 const testBitcoinCore = async () => {
-  // await execRegtest()
+  await execRegtest()
 
-  // await generate(1)
+  await generate(1)
 
   const alice = await createAccount('alice')
-  // const bob = await createAccount('bob')
+  const bob = await createAccount('bob')
 
   const utxos = txDB.searchTransaction(keys)
   console.log(utxos)
 
-  // await generate(100)
+  await generate(100)
 
   putBalance('alice')
 

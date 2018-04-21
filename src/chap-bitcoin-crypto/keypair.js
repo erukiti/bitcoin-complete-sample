@@ -150,7 +150,7 @@ class Keypair {
 
   sign(buf) {
     const sig = secp256k1.sign(buf, this.privateKey).signature
-    console.log('sign', sig.toString('hex'))
+    logger.debug('sign', sig.toString('hex'))
     return sig
   }
 

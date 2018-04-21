@@ -31,38 +31,29 @@ class TxDB {
     return this._block[blockId]
   }
 
-  searchTransaction(keys) {
+  searchTransaction(keys = []) {
     const utxos = []
     Object.keys(this._tx).forEach(txId => {
       const tx = this._tx[txId]
       tx.txOuts.forEach((txOut, index) => {
-        const res = guessScript(txOut.script)
-        if (!res) {
+        const unlocker = guessScript(txOut.script, {keys})
+        if (!unlocker) {
           return
         }
-        switch (res.type) {
+        switch (unlocker.type) {
           case 'P2PK': {
-            const key = keys.find(v => {
-              return (
-                v.toPublicKey().toString('hex') === res.pubkey.toString('hex')
-              )
-            })
-            if (!key) {
-              logger.info('P2PK unknown pubkey', txId, index, res.pubkey.toString('hex'))
-              return
-            }
-
             utxos.push({
-              key,
               hash: Buffer.from(txId, 'hex').reverse(),
               index,
               script: txOut.script,
-              type: res.type,
+              key: unlocker.key,
+              type: unlocker.type,
+              createScript: unlocker.createScript
             })
             return
           }
           default: {
-            logger.debug(`unknown lock type ${res.type}`, res)
+            logger.debug(`unknown lock type ${unlocker.type}`, unlocker)
           }
         }
       })

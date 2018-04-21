@@ -6,7 +6,34 @@ const {encodeBase58Check} = require('../chap-bitcoin-crypto/base58check')
 const {conf} = require('../')
 
 const unlockers = [
-  scriptChunks => {
+  (scriptChunks, {keys}) => {
+    if (
+      scriptChunks.length !== 2 ||
+      !(scriptChunks[0] instanceof Buffer) ||
+      scriptChunks[1] !== 'OP_CHECKSIG'
+    ) {
+      return null
+    }
+
+    const pubkey = scriptChunks[0]
+    let createScript = null
+    const key = (keys || []).find(k => {
+      return k.toPublicKey().toString('hex') === pubkey.toString('hex')
+    })
+    
+    if (key) {
+      createScript = ({sig}) => Script.asm`${sig}`
+    }
+
+    return {
+      key,
+      type: 'P2PK',
+      pubkey,
+      address: Keypair.fromPublicKey(pubkey).toAddress(),
+      createScript,
+    }
+  },
+  (scriptChunks, {keys}) => {
     if (
       scriptChunks.length !== 5 ||
       scriptChunks[0] !== 'OP_DUP' ||
@@ -20,10 +47,21 @@ const unlockers = [
     }
 
     const pubkeyHash = scriptChunks[2]
+    let createScript = null
+
+    const key = (keys || []).find(k => {
+      return k.toPublicHash().toString('hex') === pubkeyHash.toString('hex')
+    })
+    
+    if (key) {
+      createScript = ({sig}) => Script.asm`${sig} ${key.toPublicKey()}`
+    }
+
     return {
       type: 'P2PKH',
       pubkeyHash,
       address: encodeBase58Check(Buffer.concat([conf.pubkeyHash, pubkeyHash])),
+      createScript,
     }
   },
   scriptChunks => {
@@ -39,31 +77,17 @@ const unlockers = [
     return {
       type: 'P2SH',
       scriptHash: scriptChunks[1],
-    }
-  },
-  scriptChunks => {
-    if (
-      scriptChunks.length !== 2 ||
-      !(scriptChunks[0] instanceof Buffer) ||
-      scriptChunks[1] !== 'OP_CHECKSIG'
-    ) {
-      return null
-    }
-    const pubkey = scriptChunks[0]
-    return {
-      type: 'P2PK',
-      pubkey,
-      address: Keypair.fromPublicKey(pubkey).toAddress(),
+      createScript: ({sig, script}) => Script.asm`${sig} ${script}`,
     }
   },
 ]
 
-const guessScript = script => {
+const guessScript = (script, opts = {}) => {
   assert(script instanceof Script)
   const scriptChunks = script.getChunks()
-  const found = unlockers.find(unlocker => unlocker(scriptChunks))
+  const found = unlockers.find(unlocker => unlocker(scriptChunks, opts))
   if (found) {
-    return found(scriptChunks)
+    return found(scriptChunks, opts)
   }
   return null
 }
