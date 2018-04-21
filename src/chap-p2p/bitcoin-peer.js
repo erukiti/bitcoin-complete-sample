@@ -2,7 +2,7 @@ const assert = require('assert')
 const {EventEmitter} = require('events')
 const net = require('net')
 
-const {conf} = require('../')
+const {conf, logger} = require('../')
 
 const {PacketEncoder} = require('../chap-encode/packet-encoder')
 const {PacketDecoder} = require('../chap-encode/packet-decoder')
@@ -48,13 +48,18 @@ const payloadEncoders = {
   getblocks: encodeGetblocks,
 }
 
+const ignoreCommands = ['ping', 'pong'].reduce((commands, command) => {
+  commands[command] = true
+  return commands
+}, {})
+
 const HEADER_LENGTH = 4 + 12 + 4 + 4
 
 class BitcoinPeer {
   constructor() {
     this._ev = new EventEmitter()
 
-    console.log(conf)
+    logger.debug(conf)
 
     this._magic = 0xdab5bffa
     this._host = '127.0.0.1'
@@ -63,16 +68,16 @@ class BitcoinPeer {
     this._conenct = new Promise((resolve, reject) => {
       this._socket = net.connect(this._port, this._host)
       this._socket.on('connect', () => {
-        console.log('connected.')
+        logger.info('connected.')
         resolve()
       })
       this._socket.on('close', hadError =>
-        console.log('closed', hadError ? 'error' : '')
+        logger.info('closed', hadError ? 'error' : '')
       )
 
       let buf = Buffer.from([])
       this._socket.on('data', data => {
-        // console.log('received:', buf.length, data.length)
+        // logger.debug('received:', buf.length, data.length)
         buf = Buffer.concat([buf, data])
 
         while (buf.length >= HEADER_LENGTH) {
@@ -85,7 +90,7 @@ class BitcoinPeer {
           }
 
           if (!(header.command in payloadDecoders)) {
-            console.log(
+            logger.error(
               `#unknown: ${header.command}`,
               buf
                 .slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)
@@ -93,7 +98,9 @@ class BitcoinPeer {
             )
             // process.exit(0)
           } else {
-            console.log('#received:', header.command)
+            if (!(header.command in ignoreCommands)) {
+              logger.debug('#received:', header.command)
+            }
             const decoder = new PacketDecoder(
               buf.slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)
             )
@@ -132,7 +139,9 @@ class BitcoinPeer {
   send(command, payload = {}) {
     assert(command in payloadEncoders, `unknown Encoder: ${command}`)
 
-    console.log('#send:', command)
+    if (!(command in ignoreCommands)) {
+      logger.debug('#send:', command)
+    }
 
     const _encodePayload = (command, payload) => {
       const encoder = new PacketEncoder()
@@ -147,8 +156,6 @@ class BitcoinPeer {
 
     const payloadBuf = _encodePayload(command, payload)
     const header = _encodeHeader(command, payloadBuf)
-    // console.log(header.toString('hex'))
-    // console.log(payloadBuf.toString('hex'))
     this._socket.write(header)
     this._socket.write(payloadBuf)
   }

@@ -19,6 +19,12 @@ const networks = {
   },
 }
 
+const logger = {
+  debug: (...messages) => console.log('\x1b[33m', ...messages, '\x1b[m'),
+  info: (...messages) => console.log('\x1b[32m', ...messages, '\x1b[m'),
+  error: (...messages) => console.log('\x1b[31m', ...messages, '\x1b[m'),
+}
+
 const defaultConf = {
   rpcport: 18443,
   port: 18444,
@@ -34,5 +40,6 @@ const conf = {
 
 module.exports = {
   conf,
+  logger,
   networks,
 }

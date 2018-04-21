@@ -2,7 +2,7 @@
 
 const {BitcoinPeer} = require('../src/chap-p2p/bitcoin-peer')
 const {encodeVersion} = require('../src/chap-p2p/packet/version')
-const {conf} = require('../src/index')
+const {conf, logger} = require('../src/index')
 
 const peer = new BitcoinPeer()
 
@@ -10,32 +10,23 @@ const blocks = {}
 const txs = {}
 
 peer.onCommand('version', payload => {
-  console.log(payload)
+  logger.debug(payload)
   // payload.startHeight
 })
 
 peer.onCommand('sendcmpct', payload => {
-  console.log('  sendcmpct', payload)
+  logger.debug('  sendcmpct', payload)
 })
 
 peer.onCommand('feefilter', payload => {
-  console.log('  feefilter', payload)
+  logger.info('  feefilter', payload)
 })
 
 peer.onCommand('inv', payload => {
-  console.log('  inv', payload)
+  // FIXME filtering
   peer.send('getdata', payload)
 
   payload.forEach(({type, hash}) => {
-    switch (type) {
-      case 'MSG_BLOCK': {
-        console.log('  Block ID: ', hash)
-        break
-      }
-      default: {
-        console.log('  inv:', type, hash)
-      }
-    }
   })
 })
 
@@ -45,7 +36,7 @@ peer.onCommand('ping', payload => {
 
 const onTx = tx => {
   if (tx.id in txs) {
-    console.warn(`warn: Tx ${tx.id} is already exists.`)
+    logger.debug(`warn: Tx ${tx.id} is already exists.`)
   } else {
     txs[tx.id] = tx
     console.log('  Tx', tx)
@@ -54,7 +45,7 @@ const onTx = tx => {
 
 const onBlock = block => {
   if (block.id in blocks) {
-    console.warn(`warn: Block ${block.id} is already exists.`)
+    logger.debug(`warn: Block ${block.id} is already exists.`)
   } else {
     blocks[block.id] = block
     block.getTransactions().forEach(tx => onTx(tx))

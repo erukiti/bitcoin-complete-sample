@@ -3,6 +3,7 @@ const assert = require('assert')
 const {Transaction} = require('../chap-transaction/transaction')
 const {Keypair} = require('../chap-bitcoin-crypto/keypair')
 const {guessScript} = require('../chap-transaction/unlock')
+const {logger} = require('../')
 
 class TxDB {
   constructor(opts) {
@@ -47,7 +48,7 @@ class TxDB {
               )
             })
             if (!key) {
-              console.log('pubkey', txId, index, res.pubkey.toString('hex'))
+              logger.info('P2PK unknown pubkey', txId, index, res.pubkey.toString('hex'))
               return
             }
 
@@ -61,7 +62,7 @@ class TxDB {
             return
           }
           default: {
-            console.log('unknown', res)
+            logger.debug(`unknown lock type ${res.type}`, res)
           }
         }
       })
@@ -74,7 +75,7 @@ class TxDB {
   //   assert(tx instanceof Transaction)
   //   tx.txOuts.forEach(txOut => {
   //     if (txOut) {
-  //     console.log(txOut.script)
+  //     logger.debug(txOut.script)
   //     }
   //   })
   //   return []

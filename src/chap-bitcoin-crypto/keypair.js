@@ -5,7 +5,7 @@ const secp256k1 = require('secp256k1')
 
 const {decodeBase58Check, encodeBase58Check} = require('./base58check')
 const {hash160} = require('./hash')
-const {conf, networks} = require('../')
+const {conf, networks, logger} = require('../')
 
 class Keypair {
   /**
@@ -54,7 +54,7 @@ class Keypair {
       }
 
       default: {
-        console.error('unknown network')
+        logger.error('unknown network')
       }
     }
 

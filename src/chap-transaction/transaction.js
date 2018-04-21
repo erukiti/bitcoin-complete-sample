@@ -12,11 +12,9 @@ const {Keypair} = require('../chap-bitcoin-crypto/keypair')
 class Transaction {
   constructor(decoder) {
     assert(decoder instanceof PacketDecoder)
-    // console.log(buf.toString('hex'))
     this._raw = decoder.toBuffer()
     this._id = hash256(this._raw).reverse()
     this._tx = decodeTransaction(decoder)
-    // console.log(this.calcHash())
   }
 
   get id() {
@@ -60,7 +58,15 @@ class Transaction {
       txOuts: this._tx.txOuts.map(txOut => {
         const guessed = guessScript(txOut.script)
         if (guessed) {
-          return {...txOut, ...guessed}
+          const res = {}
+          Object.keys(guessed).forEach(param => {
+            if (guessed[param] instanceof Buffer) {
+              res[param] = guessed[param].toString('hex')
+            } else {
+              res[param] = guessed[param]
+            }
+          })
+          return {...txOut, ...res}
         }
         return txOut
       }),

@@ -1,5 +1,7 @@
 const assert = require('assert')
 
+const {logger} = require('../')
+
 class VM {
   constructor(bytecode = '', opt = {}) {
     this.stack = []
@@ -29,7 +31,7 @@ class VM {
       this._bytecode,
       Buffer.from(bytecode, 'hex'),
     ])
-    console.log('addBytecode:', this._bytecode.toString('hex'))
+    logger.debug('addBytecode:', this._bytecode.toString('hex'))
   }
 
   register(opCode, mnemonic, func) {
@@ -51,13 +53,13 @@ class VM {
     })
 
     if (this._isDebug) {
-      console.log(
+      logger.debug(
         `step${this._stepCounter}`,
         this._mnemonic[opCode] || '',
         opCode.toString(16).padStart(2, '0')
       )
-      console.log('  stack: ', this.stack)
-      console.log('  altStack: ', this.altStack)
+      logger.debug('  stack: ', this.stack)
+      logger.debug('  altStack: ', this.altStack)
     }
     this._stepCounter++
     return this._bytecode.length - this._offset

@@ -2,6 +2,7 @@ const assert = require('assert')
 
 const {splitBytecode} = require('./split-bytecode')
 const {opTable} = require('./op-table')
+const {logger} = require('../')
 
 const lookup = Array(256).fill('UNKNOWN_OPCODE')
 opTable.forEach(entry => {
@@ -17,7 +18,7 @@ opTable.forEach(entry => {
 const disassebleOpCode = number => {
   assert(number >= 0 && number <= 0xff)
   if (lookup[number] === 'UNKNOWN_OPCODE') {
-    console.error('Unknown OpCode:', number.toString(16))
+    logger.error('Unknown OpCode:', number.toString(16))
   }
   return lookup[number]
 }
