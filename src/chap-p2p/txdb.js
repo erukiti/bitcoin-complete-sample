@@ -40,22 +40,13 @@ class TxDB {
         if (!unlocker) {
           return
         }
-        switch (unlocker.type) {
-          case 'P2PK': {
-            utxos.push({
-              hash: Buffer.from(txId, 'hex').reverse(),
-              index,
-              script: txOut.script,
-              key: unlocker.key,
-              type: unlocker.type,
-              createScript: unlocker.createScript
-            })
-            return
-          }
-          default: {
-            logger.debug(`unknown lock type ${unlocker.type}`, unlocker)
-          }
-        }
+        utxos.push({
+          hash: Buffer.from(txId, 'hex').reverse(),
+          index,
+          value: txOut.value,
+          script: txOut.script,
+          ...unlocker
+        })
       })
     })
     return utxos
