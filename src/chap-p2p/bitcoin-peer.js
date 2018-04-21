@@ -94,7 +94,6 @@ class BitcoinPeer {
             // process.exit(0)
           } else {
             console.log('#received:', header.command)
-            // console.log(headerPayloadCodecs[header.command](buf.slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)))
             const decoder = new PacketDecoder(
               buf.slice(HEADER_LENGTH, HEADER_LENGTH + header.payloadLength)
             )

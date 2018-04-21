@@ -1,7 +1,6 @@
 const {decodeVarInt, encodeVarInt} = require('./var-int')
 
 /**
- *
  * @param {Buffer} buf
  * @param {number} offset
  */
@@ -11,7 +10,6 @@ const decodeVarBuffer = (buf, offset) => {
 }
 
 /**
- *
  * @param {Buffer} buf
  * @param {number} offset
  */
@@ -21,7 +19,6 @@ const decodeVarStr = (buf, offset) => {
 }
 
 /**
- *
  * @param {Buffer} buf
  */
 const encodeVarBuffer = buf => {
@@ -29,7 +26,6 @@ const encodeVarBuffer = buf => {
 }
 
 /**
- *
  * @param {string} s
  */
 const encodeVarStr = s => {

@@ -20,5 +20,4 @@ describe('', () => {
     expect(decoder.uInt32LE()).toEqual(0x23222102)
     expect(decoder.getLeft()).toEqual(0)
   })
-
 })

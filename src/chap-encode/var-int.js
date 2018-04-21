@@ -1,5 +1,4 @@
 /**
- *
  * @param {Buffer} buf
  * @param {number} offset
  */
@@ -18,7 +17,6 @@ const decodeVarInt = (buf, offset) => {
 }
 
 /**
- *
  * @param {number} n
  */
 const encodeVarInt = n => {

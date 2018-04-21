@@ -1,16 +1,16 @@
-const decodeVersion = (decoder) => {
+const decodeVersion = decoder => {
   const version = decoder.uInt32LE()
   const services = decoder.uInt64LE()
   const time = decoder.uInt64LE()
   const revceiverAddress = {
     services: decoder.uInt64LE(),
     address: decoder.data(16),
-    port: decoder.uInt16BE()
+    port: decoder.uInt16BE(),
   }
   const senderAddress = {
     services: decoder.uInt64LE(),
     address: decoder.data(16),
-    port: decoder.uInt16BE()
+    port: decoder.uInt16BE(),
   }
   const nonce = decoder.uInt64LE()
   const userAgent = decoder.varStr()
@@ -18,11 +18,19 @@ const decodeVersion = (decoder) => {
   const relay = decoder.int8()
 
   return {
-    version, time, services, revceiverAddress, senderAddress, nonce, userAgent, startHeight, relay
+    version,
+    time,
+    services,
+    revceiverAddress,
+    senderAddress,
+    nonce,
+    userAgent,
+    startHeight,
+    relay,
   }
 }
 
-const encodeVersion = (encoder) => {
+const encodeVersion = encoder => {
   encoder.uInt32LE(70015)
 
   encoder.uInt64LE(0)
@@ -54,5 +62,5 @@ const encodeVersion = (encoder) => {
 
 module.exports = {
   decodeVersion,
-  encodeVersion
+  encodeVersion,
 }
