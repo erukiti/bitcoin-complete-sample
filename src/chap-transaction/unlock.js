@@ -16,15 +16,15 @@ const unlockers = [
     }
 
     const pubkey = scriptChunks[0]
-    let createScript = null
     const key = (keys || []).find(k => {
       return k.toPublicKey().toString('hex') === pubkey.toString('hex')
     })
     
-    if (key) {
-      createScript = ({sig}) => Script.asm`${sig}`
+    if (!key) {
+      return null
     }
 
+    const createScript = ({sig}) => Script.asm`${sig}`
     return {
       key,
       type: 'P2PK',
@@ -47,16 +47,16 @@ const unlockers = [
     }
 
     const pubkeyHash = scriptChunks[2]
-    let createScript = null
 
+    console.log('P2PKH key', keys)
     const key = (keys || []).find(k => {
       return k.toPublicHash().toString('hex') === pubkeyHash.toString('hex')
     })
     
-    if (key) {
-      createScript = ({sig}) => Script.asm`${sig} ${key.toPublicKey()}`
+    if (!key) {
+      return null
     }
-
+    const createScript = ({sig}) => Script.asm`${sig} ${key.toPublicKey()}`
     return {
       type: 'P2PKH',
       pubkeyHash,
@@ -64,7 +64,7 @@ const unlockers = [
       createScript,
     }
   },
-  scriptChunks => {
+/*  scriptChunks => {
     if (
       scriptChunks.length !== 3 ||
       scriptChunks[0] !== 'OP_HASH160' ||
@@ -79,7 +79,7 @@ const unlockers = [
       scriptHash: scriptChunks[1],
       createScript: ({sig, script}) => Script.asm`${sig} ${script}`,
     }
-  },
+  },*/
 ]
 
 const guessScript = (script, opts = {}) => {

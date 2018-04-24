@@ -9,15 +9,31 @@ class TxDB {
   constructor(opts) {
     this._tx = {}
     this._block = {}
+    this._spent = {}
     this._txFetcher =
       opts.txFetcher || Promise.reject('Tx fetcher is not registered.')
     this._blockFetcher =
       opts.blockFetcher || Promise.reject('Block fetcher is not registered.')
   }
 
+  _registerTransaction(tx) {
+    const txId = tx.id
+    this._tx[txId] = tx
+    this._tx[txId].txIns.forEach(txIn => {
+      this._spent[`${txIn.hash.toString('hex')}:${txIn.index}`] = txIn
+    })
+  }
+
+  _registerBlock(block) {
+    const blockId = block.id
+    this._block[blockId] = block
+  }
+
   async fetchTransaction(txId) {
     if (!(txId in this._tx)) {
-      this._tx[txId] = await this._txFetcher(txId)
+      const tx = await this._txFetcher(txId)
+      assert(txId === tx.id)
+      this._registerTransaction(tx)
     }
     assert(this._tx[txId] instanceof Transaction)
     return this._tx[txId]
@@ -25,17 +41,24 @@ class TxDB {
 
   async fetchBlock(blockId) {
     if (!(blockId in this._block)) {
-      this._block[blockId] = await this._blockFetcher(blockId)
+      const block = await this._blockFetcher(blockId)
+      assert(blockId === block.id)
     }
 
     return this._block[blockId]
   }
 
-  searchTransaction(keys = []) {
+  getUtxos(keys) {
+    console.log('getUtxos', keys.length, 'keys')
     const utxos = []
     Object.keys(this._tx).forEach(txId => {
       const tx = this._tx[txId]
       tx.txOuts.forEach((txOut, index) => {
+        if (`${txId}:${index}` in this._spent) {
+          console.log(this._spent(`${txId}:${index}`), 'is used.')
+          return
+        }
+
         const unlocker = guessScript(txOut.script, {keys})
         if (!unlocker) {
           return

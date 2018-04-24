@@ -3,6 +3,8 @@ const assert = require('assert')
 const {PacketDecoder} = require('../chap-encode/packet-decoder')
 const {Script} = require('../chap-script/script')
 const {BTC} = require('./btc')
+const {encodeTransaction} = require('./encode-transaction')
+const {hash256} = require('../chap-bitcoin-crypto/hash')
 
 /**
  * 
@@ -11,6 +13,8 @@ const {BTC} = require('./btc')
 const decodeTransaction = decoder => {
   assert(decoder instanceof PacketDecoder)
   const tx = {}
+
+  tx.wtxId = hash256(decoder.toBuffer()).reverse().toString('hex')
 
   tx.version = decoder.int32LE()
   let nTxIns = decoder.varInt()
@@ -51,6 +55,10 @@ const decodeTransaction = decoder => {
     }    
   }
   tx.locktime = decoder.uInt32LE()
+
+  const withoutWitnessTx = encodeTransaction({...tx, isSegWit: false})
+  tx.id = hash256(withoutWitnessTx).reverse().toString('hex')
+
   return tx
 }
 

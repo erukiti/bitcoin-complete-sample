@@ -6,14 +6,29 @@ const net = require('net')
 
 const {conf} = require('../')
 
+/**
+ * regtestモードでbitcoindを起動する
+ * @param {object} opt オプションオブジェクト
+ * @param {string} opt.datadir データディレクトリ。未指定ならテンポラリを作成して新規のブロックチェーンを作る
+ * @param {number} opt.port P2P用通信ポート番号
+ * @param {number} opt.rpcport JSON/RPC用通信ポート番号 
+ * @param {string} opt.user JSON/RPC ユーザー名
+ * @param {string} opt.pass JSON/RPC パスワード 
+ * @returns {Promise<string>} 起動が完了したらデータディレクトリが渡ってくる
+ * @example
+ * const app = async () => {
+ *   const datadir = await execRegtest()
+ *   console.log('datadir', datadir)
+ * }
+ */
 const execRegtest = (opt = conf) => {
   return new Promise((resolve, reject) => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'regtest-'))
+    const datadir = fs.mkdtempSync(path.join(os.tmpdir(), 'regtest-'))
 
     const params = [
       'bitcoind',
       '-regtest',
-      `-datadir=${tmp}`,
+      `-datadir=${datadir}`,
       '-txindex',
       '-server',
       '-rest',
@@ -41,7 +56,7 @@ const execRegtest = (opt = conf) => {
       const socket = net.connect(opt.port, '127.0.0.1')
       socket.on('connect', () => {
         clearInterval(interval)
-        resolve()
+        resolve(datadir)
       })
       socket.on('error', err => {
         if (err.code !== 'ECONNREFUSED') {

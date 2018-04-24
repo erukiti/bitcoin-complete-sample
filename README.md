@@ -2,6 +2,10 @@
 
 [JavaScriptで覚える暗号通貨入門#1 Bitcoin完全に理解した](https://rabbit-house.tokyo/books/bitcoin-complete/)に登場するサンプルソースのリポジトリです。
 
+## 履歴
+
+* [初版 4/22 技術書典4](https://github.com/erukiti/bitcoin-complete-sample/tree/1th-tbf4)
+
 ## ライセンス
 
 MIT Licenseです。

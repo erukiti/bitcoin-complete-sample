@@ -13,12 +13,9 @@ class Transaction {
   constructor(decoder) {
     assert(decoder instanceof PacketDecoder)
     this._raw = decoder.toBuffer()
-    this._id = hash256(this._raw).reverse()
     this._tx = decodeTransaction(decoder)
-  }
-
-  get id() {
-    return this._id.toString('hex')
+    this.id = this._tx.id
+    this.wtxId = this._tx.wtxId
   }
 
   static encode(tx) {
@@ -45,8 +42,9 @@ class Transaction {
 
   inspect() {
     return {
-      txId: this._id.toString('hex'),
+      id: this.id,
       isSegwit: this._tx.isSegWit,
+      wtxId: this.wtxId,
       version: this._tx.version,
       txIns: this._tx.txIns.map(txIn => ({
         hash: txIn.hash.reverse().toString('hex'),
