@@ -2,6 +2,9 @@
 
 [JavaScriptで覚える暗号通貨入門#1 Bitcoin完全に理解した](https://rabbit-house.tokyo/books/bitcoin-complete/)に登場するサンプルソースのリポジトリです。
 
+* [JavaScriptで覚える暗号通貨入門#1 Bitcoin完全に理解した 前編 - - BOOTH（同人誌通販・ダウンロード）](https://tk-rabbit-house.booth.pm/items/828671)
+* [JavaScriptで覚える暗号通貨入門#1 Bitcoin完全に理解した 電子版｜erukiti｜note](https://note.mu/erukiti/n/n1177b759eb4c)
+
 ## 履歴
 
 * [初版 4/22 技術書典4](https://github.com/erukiti/bitcoin-complete-sample/tree/1th-tbf4)
@@ -13,9 +16,21 @@ MIT Licenseです。
 ```
 Copyright 2018, SASAKI Shunsuke  https://rabbit-house.tokyo/books/bitcoin-complete/
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to 
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
+sell copies of the Software, and to permit persons to whom the Software is 
+furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+DEALINGS IN THE SOFTWARE.
 ```

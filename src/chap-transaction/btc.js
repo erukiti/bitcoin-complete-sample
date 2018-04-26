@@ -39,7 +39,8 @@ class BTC {
   }
 
   inspect() {
-    return `${this.satoshi / 10 ** 8} BTC (${this.satoshi} Satoshi)`
+    const satoshi = this.satoshi.toString(10).replace(/(\d)(?=(\d\d\d)+$)/g, '$1,')
+    return `${this.satoshi / 10 ** 8} BTC (${satoshi} Satoshi)`
   }
 }
 

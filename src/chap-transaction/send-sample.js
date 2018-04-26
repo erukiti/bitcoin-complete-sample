@@ -129,6 +129,7 @@ const sendTransaction = async (senderKeys, address, value, locktime = 0) => {
 const sendToP2PKH = (address) => {
   const utxos = txDB.getUtxos(keys)
   const utxo = utxos[0]
+  console.log(utxo)
 
   const txIns = [
     {
@@ -181,8 +182,8 @@ const testBitcoinCore = async () => {
   await putInfo()
 
   const txHex = await sendToP2PKH(alice.toAddress())
-  console.log(txHex)
   console.log(await cl.sendRawTransaction(txHex))
+  console.log(txHex)
   // await sendTransaction(keys, alice.toAddress(), BTC.fromBTC(49.99999))
 
   await putInfo()
