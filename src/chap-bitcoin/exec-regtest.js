@@ -23,7 +23,7 @@ const {conf} = require('../')
  */
 const execRegtest = (opt = conf) => {
   return new Promise((resolve, reject) => {
-    const datadir = fs.mkdtempSync(path.join(os.tmpdir(), 'regtest-'))
+    const datadir = opt.datadir || fs.mkdtempSync(path.join(os.tmpdir(), 'regtest-'))
 
     const params = [
       'bitcoind',
