@@ -14,6 +14,7 @@ class Transaction {
     assert(decoder instanceof PacketDecoder)
     this._raw = decoder.toBuffer()
     this._tx = decodeTransaction(decoder)
+    // this.id = this._tx.wtxId
     this.id = this._tx.id
     this.wtxId = this._tx.wtxId
   }
@@ -47,7 +48,7 @@ class Transaction {
       wtxId: this.wtxId,
       version: this._tx.version,
       txIns: this._tx.txIns.map(txIn => ({
-        hash: txIn.hash.reverse().toString('hex'),
+        hash: txIn.hash.toString('hex'),
         index: txIn.index,
         script: txIn.script,
         sequence: txIn.sequence.toString(16).padStart(0, 8, '0'),

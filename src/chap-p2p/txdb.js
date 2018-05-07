@@ -32,6 +32,10 @@ class TxDB {
   async fetchTransaction(txId) {
     if (!(txId in this._tx)) {
       const tx = await this._txFetcher(txId)
+
+      // FIXME
+      txId = tx.id
+
       assert(txId === tx.id)
       this._registerTransaction(tx)
     }
@@ -43,6 +47,7 @@ class TxDB {
     if (!(blockId in this._block)) {
       const block = await this._blockFetcher(blockId)
       assert(blockId === block.id)
+      this._block[blockId] = block
     }
 
     return this._block[blockId]
@@ -64,7 +69,7 @@ class TxDB {
           return
         }
         utxos.push({
-          hash: Buffer.from(txId, 'hex').reverse(),
+          hash: Buffer.from(txId, 'hex'),
           index,
           value: txOut.value,
           script: txOut.script,

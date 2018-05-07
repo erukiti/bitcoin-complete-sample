@@ -64,7 +64,7 @@ const unlockers = [
       createScript,
     }
   },
-/*  scriptChunks => {
+  scriptChunks => {
     if (
       scriptChunks.length !== 3 ||
       scriptChunks[0] !== 'OP_HASH160' ||
@@ -79,7 +79,7 @@ const unlockers = [
       scriptHash: scriptChunks[1],
       createScript: ({sig, script}) => Script.asm`${sig} ${script}`,
     }
-  },*/
+  }
 ]
 
 const guessScript = (script, opts = {}) => {

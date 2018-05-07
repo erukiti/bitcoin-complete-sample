@@ -15,6 +15,7 @@ class Block {
    * @param {Buffer} buf 
    */
   static fromBuffer(buf) {
+    assert(buf instanceof Buffer)
     return new Block(PacketDecoder.fromBuffer(buf))
   }
 
@@ -23,6 +24,7 @@ class Block {
    * @param {string} hex 
    */
   static fromHex(hex) {
+    assert(typeof hex === 'string')
     return new Block(PacketDecoder.fromHex(hex))
   }
 
@@ -32,6 +34,15 @@ class Block {
   get id() {
     return this._block.id.toString('hex')
   }
+
+  get tx() {
+    return this._block.tx
+  }
+
+  get txIds() {
+    return this._block.tx.map(tx => tx.id)
+  }
+
 
   /**
    * @returns {Transaction[]}

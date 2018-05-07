@@ -59,21 +59,24 @@ const txDB = new TxDB({
  * @returns {Promise<void>}
  */
 const generate = async n => {
-  const txs = []
   const blockIds = await cl.generate(n)
   for (let blockId of blockIds) {
     const b = await txDB.fetchBlock(blockId)
-    const block = await cl.getBlock(blockId)
+    // console.log(b.txIds)
 
-    for (let txId of block.tx) {
-      await txDB.fetchTransaction(txId)
+    for (let txId of b.txIds) {
+      // console.log(txId)
+      const tx2 = await txDB.fetchTransaction(txId)
+      // console.log(tx2)
       const tx = await cl.getTransaction(txId)
+      // console.log(tx)
       for (let detail of tx.details) {
         const wif = await cl.dumpPrivKey(detail.address)
         keys.push(Keypair.fromWIF(wif))
       }
     }
   }
+  return blockIds
 }
 
 const sendTransaction = async (senderKeys, address, value, locktime = 0) => {
@@ -118,7 +121,7 @@ const sendTransaction = async (senderKeys, address, value, locktime = 0) => {
   ])
   txIns[0].script = utxo.createScript({sig})
   const sendTx = Transaction.encode({txIns, txOuts, version: 2, locktime})
-  logger.debug(sendTx.toHex())
+  logger.debug(sendTx)
   const sendTxId = await cl.sendRawTransaction(sendTx.toHex())
   txDB.fetchTransaction(sendTxId)
   logger.info(`send ${value.toBTC()} BTC to ${address}`)
@@ -129,7 +132,6 @@ const sendTransaction = async (senderKeys, address, value, locktime = 0) => {
 const sendToP2PKH = (address) => {
   const utxos = txDB.getUtxos(keys)
   const utxo = utxos[0]
-  console.log(utxo)
 
   const txIns = [
     {
@@ -142,7 +144,7 @@ const sendToP2PKH = (address) => {
   const sendHash = decodeBase58Check(address).slice(1)
   const txOuts = [
     {
-      value: BTC.fromBTC(49.99999),
+      value: BTC.fromBTC(49.9999),
       script: Script.asm`OP_DUP OP_HASH160 ${sendHash} OP_EQUALVERIFY OP_CHECKSIG`,
     }
   ]
@@ -178,22 +180,29 @@ const testBitcoinCore = async () => {
   const bob = await createAccount('bob')
   const charlie = await createAccount('charlie')
 
-  await generate(101)
+  const blockId = await generate(1)
+  console.log(blockId)
+  await generate(100)
+
+
+  // const txHex = await sendToP2PKH(alice.toAddress())
+
+  // const txId = await cl.sendToAddress(alice.toAddress(), 49.9999)
+  // const txHex2 = await cl.getRawTransaction(txId)
+  // console.log(await cl.decodeRawTransaction(txHex2))
+
+  // console.log(txHex)
+  // console.log(await cl.sendRawTransaction(txHex))
+  await sendTransaction(keys, alice.toAddress(), BTC.fromBTC(40))
+
   await putInfo()
 
-  const txHex = await sendToP2PKH(alice.toAddress())
-  console.log(await cl.sendRawTransaction(txHex))
-  console.log(txHex)
-  // await sendTransaction(keys, alice.toAddress(), BTC.fromBTC(49.99999))
-
+  await generate(1)
   await putInfo()
 
-  await cl.generate(1)
-  await putInfo()
-
-  await sendTransaction([alice], bob.toAddress(), BTC.fromBTC(20))
-  await cl.generate(1)
-  await putInfo()
+  // await sendTransaction([alice], bob.toAddress(), BTC.fromBTC(20))
+  // await generate(1)
+  // await putInfo()
 
 }
 
