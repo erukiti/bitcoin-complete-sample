@@ -16,6 +16,12 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
+"@types/big-integer@^0.0.31":
+  version "0.0.31"
+  resolved "https://registry.yarnpkg.com/@types/big-integer/-/big-integer-0.0.31.tgz#021c505b5d8ad592cb7ffcda7af88b4fc12d4995"
+  dependencies:
+    big-integer "*"
+
 "@types/bigi@*":
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/@types/bigi/-/bigi-1.4.1.tgz#d2a75ad76b76bb53c38e1a6670c8a08d457edef7"
@@ -407,6 +413,10 @@ bcrypt-pbkdf@^1.0.0:
 bech32@^1.1.2:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/bech32/-/bech32-1.1.3.tgz#bd47a8986bbb3eec34a56a097a84b8d3e9a2dfcd"
+
+big-integer@*, big-integer@^1.6.28:
+  version "1.6.28"
+  resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.28.tgz#8cef0fda3ccde8759c2c66efcfacc35aea658283"
 
 bigi@^1.1.0, bigi@^1.4.0:
   version "1.4.2"
