@@ -68,7 +68,7 @@ const testBitcoinCore = async () => {
   console.log()
 
   console.log('#getBalance hoge')
-  console.log(await cl.getBalance('hoge'))
+  console.log(await cl.getReceivedByAddress(address))
   console.log()
 
   console.log('#generate 1')
@@ -76,7 +76,7 @@ const testBitcoinCore = async () => {
   console.log()
 
   console.log('#getBalance hoge')
-  console.log(await cl.getBalance('hoge'))
+  console.log(await cl.getReceivedByAddress(address))
 }
 
 testBitcoinCore()

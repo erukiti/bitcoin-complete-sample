@@ -1,0 +1,10 @@
+#! /usr/bin/env node
+
+const {execRegtest} = require('../src/chap-bitcoin/exec-regtest')
+
+const runRegtest = async () => {
+    await execRegtest()
+    console.log('bitcoind start.')
+}
+
+runRegtest().catch(err => console.error(err))

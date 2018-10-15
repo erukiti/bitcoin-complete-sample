@@ -14,7 +14,7 @@ const {conf} = require('../')
  * @param {number} opt.rpcport JSON/RPC用通信ポート番号 
  * @param {string} opt.user JSON/RPC ユーザー名
  * @param {string} opt.pass JSON/RPC パスワード 
- * @returns {Promise<string>} 起動が完了したらデータディレクトリが渡ってくる
+ * @returns {Promise<string>} 起動完了でデータディレクトリの名前が返る
  * @example
  * const app = async () => {
  *   const datadir = await execRegtest()
@@ -40,11 +40,15 @@ const execRegtest = (opt = conf) => {
 
     const child = childPorcess.exec(params.join(' '))
     child.stdout.on('data', data => {
-      console.log('bitcoind stdout:', data.toString())
+      data.toString().trim().split('\n').forEach(line => {
+        console.log('\x1b[32mbitcoind\x1b[m', line)
+      })
     })
 
     child.stderr.on('data', data => {
-      console.log('bitcoind stderr:', data.toString())
+      data.toString().trim().split('\n').forEach(line => {
+        console.log('\x1b[32merror\x1b[m', line)
+      })
     })
 
     child.on('close', code => {
