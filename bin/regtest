@@ -2,8 +2,16 @@
 
 const {execRegtest} = require('../src/chap-bitcoin/exec-regtest')
 
+const conf = {...require('../src').conf}
+process.argv.slice(2).forEach(arg => {
+    const ar = arg.split('=')
+    if (ar.length === 2) {
+        conf[ar[0]] = ar[1]
+    }
+})
+
 const runRegtest = async () => {
-    await execRegtest()
+    await execRegtest(conf)
     console.log('bitcoind start.')
 }
 
